@@ -1,0 +1,22 @@
+const SERVER = 'http://192.168.1.85:1994/';
+const STORAGE = `${SERVER}/storage/`;
+const API = `${SERVER}/api`;
+const config = {
+    urls: {
+        login: `${API}/auth/login`,
+        register: `${API}/auth/register`,
+        logout: `${API}/auth/logout`,
+        forget_password: `${API}/auth/forget_password`,
+        update_profile: `${API}/auth/update_profile`,
+        get_languages: `${API}/get_languages`,
+        refresh: `${API}/auth/refresh`,
+        me: `${API}/auth/me`,
+        get_room: `${API}/get_room`,
+        leave_room: `${API}/leave_room`,
+        get_all_friends: `${API}/get_all_friends`,
+        send_message: `${API}/send_message`,
+        get_messages: `${API}/get_messages`,
+    }
+}
+
+module.exports = config;

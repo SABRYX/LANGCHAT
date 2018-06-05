@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "LangChat",
+    "slug": "langchat",
+    "sdkVersion": "23.0.0",
+    "privacy": "public"
+  }
+}
