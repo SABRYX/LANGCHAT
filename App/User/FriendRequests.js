@@ -13,7 +13,7 @@ import api from '../services/api';
 import {globals} from "../services/globals";
 import UserChat from "./UserChat";
 
-export default class UserFriends extends Component {
+export default class FriendRequest extends Component {
     accessToken;
 
     constructor(props) {
@@ -160,7 +160,7 @@ export default class UserFriends extends Component {
                         </Button>
                     </Left>
                     <Body>
-                        <Title>{ this.state.screen == 1 ? 'My Friends' : this.state.currentFriend.user.name }</Title>
+                        <Title>{ this.state.screen == 1 ? 'Friend Requests' : this.state.currentFriend.user.name }</Title>
                     </Body>
                 </Header>
                 {this.renderBody()}

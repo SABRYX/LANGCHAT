@@ -13,7 +13,7 @@ import api from '../services/api';
 import {globals} from "../services/globals";
 import UserChat from "./UserChat";
 
-export default class UserFriends extends Component {
+export default class containerOfTabs extends Component {
     accessToken;
 
     constructor(props) {
@@ -163,16 +163,7 @@ export default class UserFriends extends Component {
                         <Title>{ this.state.screen == 1 ? 'My Friends' : this.state.currentFriend.user.name }</Title>
                     </Body>
                 </Header>
-                {this.renderBody()}
-                {
-                    this.state.screen != 1 ? (
-                        <UserChat
-                            ref={(ref) => { this.state.userChatRef = ref; }}
-                            data={{ friend_id: this.state.currentFriend.user.id, friend_name: this.state.currentFriend.user.name }} />
-                    )
-                    :
-                    null
-                }
+                
             </Container>
         )
     }

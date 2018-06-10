@@ -10,7 +10,9 @@ import MainAppScreen from './MainAppScreen/MainAppScreen';
 import UserSettings from './User/UserSettings';
 import UserFriends from './User/UserFriends';
 import UserChat from './User/UserChat';
-import storage from './services/storage'
+import storage from './services/storage';
+import FriendRequest from "./User/FriendRequests";
+import containerOfTabs from "./User/containerOfTabs"
 let context;
 
 GLOBAL.showToast = (message) => {
@@ -89,12 +91,20 @@ export default class App extends Component {
 									renderBackButton={() => (null)}
 									hideNavBar
 								/>
-								<Scene
-									key="userFriends"
-									component={UserFriends}
-									renderBackButton={() => (null)}
-									hideNavBar
-								/>
+								
+									<Scene key="myTabBar" tabBarPosition="bottom" headerMode="screen" tabs={true}  swipeEnabled tabBarStyle={{ backgroundColor: 'white',marginTop:"0%",padding:"0%" }} >
+									
+											<Scene
+												key="userFriends"
+												component={UserFriends}
+												hideNavBar
+											/>
+											<Scene
+												key="FriendRequest"
+												component={FriendRequest}
+												hideNavBar
+											/>
+									</Scene>
 								<Scene
 									key="userChat"
 									component={UserChat}

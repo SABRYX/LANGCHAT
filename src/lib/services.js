@@ -153,6 +153,7 @@ socket.on('leave', function (socketId) {
 });
 
 socket.on('connect', function (data) {
+	console.log('connect')
 	globals.mainSocket = socket;
 });
 

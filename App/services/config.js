@@ -11,11 +11,11 @@ const config = {
         get_languages: `${API}/get_languages`,
         refresh: `${API}/auth/refresh`,
         me: `${API}/auth/me`,
-        get_room: `${API}/get_room`,
-        leave_room: `${API}/leave_room`,
-        get_all_friends: `${API}/get_all_friends`,
-        send_message: `${API}/send_message`,
-        get_messages: `${API}/get_messages`,
+        get_room: `${API}/room/get_room`,
+        leave_room: `${API}/room/leave_room`,
+        get_all_friends: `${API}/friend/get_all_friends`,
+        send_message: `${API}/message/send_message`,
+        get_messages: `${API}/message/get_messages`,
     }
 }
 

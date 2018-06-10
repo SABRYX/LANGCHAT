@@ -14,7 +14,6 @@ import { GiftedChat, Send } from 'react-native-gifted-chat'
 import { globals } from "../services/globals";
 
 export default class UserChat extends Component {
-    accessToken
 
     constructor(props) {
         super(props);
@@ -29,21 +28,22 @@ export default class UserChat extends Component {
     }
 
     async componentDidMount() {
-        try {
-            await storage.getItem('chat_' + this.state.friend_id).then(async (messages) => {
-                if (messages !== null) {
-                    messages = JSON.parse(messages)
-                    this.setState(previousState => ({
-                        messages: GiftedChat.append(previousState.messages, messages),
-                    }))
-                }
-                this.loadMessages(JSON.parse(messages))
-                this.setState({page: 1})
-            })
-        }
-        catch (error) {
-            this.loadMessages(null)
-        }
+        // try {
+        //     await storage.getItem('chat_' + this.state.friend_id).then(async (messages) => {
+        //         if (messages !== null) {
+        //             messages = JSON.parse(messages)
+        //             this.setState(previousState => ({
+        //                 messages: GiftedChat.append(previousState.messages, messages),
+        //             }))
+        //         }
+        //         this.loadMessages(JSON.parse(messages))
+        //         this.setState({page: 1})
+        //     })
+        // }
+        // catch (error) {
+        //     this.loadMessages(null)
+        // }
+        this.loadMessages(null)
     }
 
     async loadMessages(messages) {
@@ -55,18 +55,18 @@ export default class UserChat extends Component {
                     element.created_at = new Date(element.created_at)
                 })
 
-                await storage.setItem('chat_' + this.state.friend_id, response.data)
+                // await storage.setItem('chat_' + this.state.friend_id, response.data)
 
-                let data;
-                if (messages !== null) {
-                    if (response.data.length > messages)
-                        data = response.data
-                    else data = messages
-                }
-                else data = response.data
+                // let data;
+                // if (messages !== null) {
+                //     if (response.data.length > messages)
+                //         data = response.data
+                //     else data = messages
+                // }
+                // else data = response.data
 
                 this.setState(previousState => ({
-                    messages: GiftedChat.append(previousState.messages, data),
+                    messages: GiftedChat.prepend(previousState.messages, response.data),
                     page: this.state.page + 1
                 }))
             })
