@@ -110,7 +110,7 @@ export default class MainAppScreen extends Component {
 				<Icon style={{color: 'white', fontSize: 35}} name="md-contact" />
 			</TouchableHighlight>
 
-			<TouchableHighlight style={styles.friendsIcon} onPress={() => Actions.push('userFriends')}>
+			<TouchableHighlight style={styles.friendsIcon} onPress={() => {Actions.push('containerOfTabs');console.log("holahola")}}>
 				<Icon style={{color: 'white', fontSize: 35}} name="md-contacts" />
 			</TouchableHighlight>
 

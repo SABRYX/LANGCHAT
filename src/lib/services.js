@@ -8,7 +8,7 @@ let onFriendConnectedCallback = null;
 let onDataChannelMessageCallback = null;
 
 const socketIOClient = require('socket.io-client');
-let socket = socketIOClient('http://192.168.1.38:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
+let socket = socketIOClient('http://192.168.1.30:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
 
 var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
 var peerConnections = {}; //map of {socketId: socket.io id, RTCPeerConnection}

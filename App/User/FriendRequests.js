@@ -41,7 +41,7 @@ export default class FriendRequest extends Component {
 
         storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
-            api.get_all_friends(result).then((response) => {
+            api.get_all_requests(result).then((response) => {
                 console.log(response)
                 this.setState({ screen: 1, dataLoaded: "done", friends: response.data })
             })
@@ -112,10 +112,9 @@ export default class FriendRequest extends Component {
                                             </Left>
                                             <Body>
                                                 <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }}>{friend.user.name}</Text>
-                                                <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message.substring(0, 30) + (friend.last_message.length > 30 ? '...' : '')}</Text>
                                             </Body>
                                             <Right>
-                                                <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message_time}</Text>
+                                                
                                             </Right>
                                         </ListItem>
                                     }>
@@ -153,16 +152,6 @@ export default class FriendRequest extends Component {
     render() {
         return (
             <Container style={{ backgroundColor: 'white', flex: 1 }}>
-                <Header style={{ marginTop: 15 }} noShadow>
-                    <Left>
-                        <Button transparent onPress={() => Actions.pop()}>
-                            <Icon name='arrow-back' />
-                        </Button>
-                    </Left>
-                    <Body>
-                        <Title>{ this.state.screen == 1 ? 'Friend Requests' : this.state.currentFriend.user.name }</Title>
-                    </Body>
-                </Header>
                 {this.renderBody()}
                 {
                     this.state.screen != 1 ? (

@@ -16,6 +16,7 @@ const config = {
         get_all_friends: `${API}/friend/get_all_friends`,
         send_message: `${API}/message/send_message`,
         get_messages: `${API}/message/get_messages`,
+        get_all_requests:`${API}/friend/get_all_requests`,
     }
 }
 

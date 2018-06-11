@@ -68,7 +68,10 @@ const api =  {
     },
     get_messages: async (to, page, accessToken) => {
         return await apiFetch(config.urls.get_messages, methods.post, JSON.stringify({ to: to, page: page }), accessToken);
-    }
+    },
+    get_all_requests: async (accessToken) => {
+        return await apiFetch(config.urls.get_all_friends, methods.get, null, accessToken);
+    },
 }
 
 module.exports = api;

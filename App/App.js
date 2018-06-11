@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StatusBar, Platform, BackHandler } from 'react-native';
-import { Root } from "native-base";
+import { Root,Header } from "native-base";
 import { Router, Scene, Actions } from 'react-native-router-flux';
 import Toast, { DURATION } from 'react-native-easy-toast';
 import SplashScreen from 'react-native-splash-screen';
@@ -91,20 +91,18 @@ export default class App extends Component {
 									renderBackButton={() => (null)}
 									hideNavBar
 								/>
+																		
+								<Scene
+									key="userFriends"
+									component={UserFriends}
+									hideNavBar
+									/>
 								
-									<Scene key="myTabBar" tabBarPosition="bottom" headerMode="screen" tabs={true}  swipeEnabled tabBarStyle={{ backgroundColor: 'white',marginTop:"0%",padding:"0%" }} >
-									
-											<Scene
-												key="userFriends"
-												component={UserFriends}
-												hideNavBar
-											/>
-											<Scene
-												key="FriendRequest"
-												component={FriendRequest}
-												hideNavBar
-											/>
-									</Scene>
+								<Scene
+									key="containerOfTabs"
+									component={containerOfTabs}
+									hideNavBar
+									/>
 								<Scene
 									key="userChat"
 									component={UserChat}

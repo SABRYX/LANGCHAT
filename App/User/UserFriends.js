@@ -43,7 +43,10 @@ export default class UserFriends extends Component {
             accessToken = result
             api.get_all_friends(result).then((response) => {
                 console.log(response)
-                this.setState({ screen: 1, dataLoaded: "done", friends: response.data })
+                response.data.forEach(element => {
+                   this.state.friends.push(element.user2) 
+                });
+                this.setState({ screen: 1, dataLoaded: "done" })
             })
         })
 
@@ -102,17 +105,17 @@ export default class UserFriends extends Component {
                                                     loadingStyle={{ width: 50, height: 50 }}
                                                     placeholderStyle={{ width: 50, height: 50, resizeMode: Image.resizeMode.stretch, borderRadius: 50 }}
                                                     borderRadius={50}
-                                                    source={{ uri: friend.user.avatar }}
+                                                    source={{ uri: friend.avatar }}
                                                     placeholderSource={	require('../../assets/default_avatar.png') } />
                                                 {
-                                                    friend.user.is_online ? (
+                                                    friend.is_online ? (
                                                     <Icon name='ios-radio-button-on' style={{color:'green', position: 'absolute', bottom: 0, right: -8}} />
                                                     ) : null
                                                 }
                                             </Left>
                                             <Body>
-                                                <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }}>{friend.user.name}</Text>
-                                                <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message.substring(0, 30) + (friend.last_message.length > 30 ? '...' : '')}</Text>
+                                                <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }}>{friend.name}</Text>
+                                                {/* <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message.substring(0, 30) + (friend.last_message.length > 30 ? '...' : '')}</Text> */}
                                             </Body>
                                             <Right>
                                                 <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message_time}</Text>
@@ -153,22 +156,12 @@ export default class UserFriends extends Component {
     render() {
         return (
             <Container style={{ backgroundColor: 'white', flex: 1 }}>
-                <Header style={{ marginTop: 15 }} noShadow>
-                    <Left>
-                        <Button transparent onPress={() => Actions.pop()}>
-                            <Icon name='arrow-back' />
-                        </Button>
-                    </Left>
-                    <Body>
-                        <Title>{ this.state.screen == 1 ? 'My Friends' : this.state.currentFriend.user.name }</Title>
-                    </Body>
-                </Header>
                 {this.renderBody()}
                 {
                     this.state.screen != 1 ? (
                         <UserChat
                             ref={(ref) => { this.state.userChatRef = ref; }}
-                            data={{ friend_id: this.state.currentFriend.user.id, friend_name: this.state.currentFriend.user.name }} />
+                            data={{ friend_id: this.state.currentFriend.id, friend_name: this.state.currentFriend.name }} />
                     )
                     :
                     null
