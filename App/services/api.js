@@ -70,7 +70,7 @@ const api =  {
         return await apiFetch(config.urls.get_messages, methods.post, JSON.stringify({ to: to, page: page }), accessToken);
     },
     get_all_requests: async (accessToken) => {
-        return await apiFetch(config.urls.get_all_friends, methods.get, null, accessToken);
+        return await apiFetch(config.urls.get_all_requests, methods.get, null, accessToken);
     },
 }
 

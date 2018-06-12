@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { View, Image, ScrollView, BackHandler } from 'react-native';
+import { View, Image, ScrollView, BackHandler,TouchableOpacity } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
-    Title, Text, Form, Toast, Spinner, List, ListItem, Thumbnail
+    Title, Text, Form, Toast, Spinner, List, ListItem, Thumbnail,Badge  
 } from 'native-base';
 import ImageLoad from 'react-native-image-placeholder';
 import config from "../../src/config/app.js";
@@ -43,36 +43,23 @@ export default class FriendRequest extends Component {
             accessToken = result
             api.get_all_requests(result).then((response) => {
                 console.log(response)
-                this.setState({ screen: 1, dataLoaded: "done", friends: response.data })
+                response.forEach(element => {
+                    this.state.friends.push(element) 
+                 });
+                this.setState({ screen: 1, dataLoaded: "done"})
+                console.log(this.state.friends);
             })
         })
+    }
 
-        console.log(globals.mainSocket)
-        globals.mainSocket.on('chat_message', (data) => {
-            if (this.state.screen == 1) {
-                if (data.user_id == globals.user.id) {
-                    let friends = this.state.friends;
-                    let _friend = null;
-                    friends.forEach((friend, index) => {
-                        if (friend.user.id == data.message.user._id) {
-                            friend.last_message = data.message.text
-                            friend.last_message_time = data.last_message_time
-                            friend.last_message_date = data.last_message_date
-                            friend.is_seen = false
-                            _friend = friend;
-
-                            friends.splice(index, 1)
-                        }
-                    })
-
-                    this.setState({ friends: friends })
-                    if (_friend != null)
-                        friends.push(_friend)
-                    this.setState({ friends: friends })
-                }
-            }
-            else this.state.userChatRef.updateMessage(data)
-        })
+    removeRequestFromUI(requestNumber){
+        var index = requestNumber;
+        // this.state.friends.splice(index,1);
+        delete this.state.friends [index]
+        // console.log(requestNumber);
+        this.setState({friends: this.state.friends})
+        
+        
     }
 
     componentWillUnmount() {
@@ -92,10 +79,8 @@ export default class FriendRequest extends Component {
                             return new Date(b.last_message_date) - new Date(a.last_message_date);
                         })}
                         renderRow={(friend, s1, index) =>
-                                <ListItem avatar
-                                    onPress={() => this.setState({ screen: 2, currentFriend: friend }) }
-                                    style={{ backgroundColor: friend.is_seen ? 'transparent' : '#eaf2ff' }}>
-                                            <Left>
+                                <ListItem style={{ backgroundColor: friend.is_seen ? 'transparent' : 'transparent',marginTop:"2%",flexDirection:"row",flex:1 }}>
+                                            <Left style={{margin:"0%",flex:1}}>
                                                 {/* <Thumbnail source={{uri: friend.avatar}} /> */}
                                                 <ImageLoad
                                                     style={{ width: 50, height: 50 }}
@@ -104,17 +89,23 @@ export default class FriendRequest extends Component {
                                                     borderRadius={50}
                                                     source={{ uri: friend.user.avatar }}
                                                     placeholderSource={	require('../../assets/default_avatar.png') } />
-                                                {
-                                                    friend.user.is_online ? (
-                                                    <Icon name='ios-radio-button-on' style={{color:'green', position: 'absolute', bottom: 0, right: -8}} />
-                                                    ) : null
-                                                }
-                                            </Left>
-                                            <Body>
-                                                <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }}>{friend.user.name}</Text>
-                                            </Body>
-                                            <Right>
                                                 
+                                            </Left>
+                                            <Body style={{marginLeft:"0%",width:180,flex:3}}>
+                                                <Text style={{ fontWeight: 'normal' ,textAlign:"left" }}>{friend.user.name}</Text>
+                                            </Body>
+                                            <Right style={{flexDirection:"row",flex:2,justifyContent:"space-between"}}>
+                                                <TouchableOpacity style={{width: 50, height: 40,margin:"0%",justifyContent:"center"}} 
+                                                    onPress={()=>{this.removeRequestFromUI(index);}}
+                                                >
+                                                    <Icon name='check' type="FontAwesome" style={{color:"green",alignSelf:"center"}}  />
+                                                </TouchableOpacity>
+                                                
+                                                <TouchableOpacity style={{width: 50, height: 40,margin:"0%",justifyContent:"center"}}  
+                                                    onPress={()=>{console.log(this.state.friends[index].to);this.removeRequestFromUI(index);}}
+                                                >
+                                                    <Icon name='remove' type="FontAwesome" style={{color:"red",alignSelf:"center"}} />
+                                                </TouchableOpacity>
                                             </Right>
                                         </ListItem>
                                     }>

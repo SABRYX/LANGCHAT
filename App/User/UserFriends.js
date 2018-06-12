@@ -42,10 +42,10 @@ export default class UserFriends extends Component {
         storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
             api.get_all_friends(result).then((response) => {
-                console.log(response)
                 response.data.forEach(element => {
-                   this.state.friends.push(element.user2) 
+                   this.state.friends.push(element.friend)
                 });
+                console.log(this.state.friends)
                 this.setState({ screen: 1, dataLoaded: "done" })
             })
         })
