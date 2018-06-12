@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, TouchableHighlight, View, ListView, Image, TextInput, DeviceEventEmitter } from 'react-native';
+import { StyleSheet, TouchableHighlight, View, ListView, Image, TextInput, DeviceEventEmitter,BackHandler } from 'react-native';
 import { RTCView } from 'react-native-webrtc';
 import { Button, Text, Icon, Spinner } from 'native-base';
 import Thumbnails from "../../src/components/Thumbnails.js";
@@ -46,6 +46,7 @@ export default class MainAppScreen extends Component {
 
 	async componentDidMount() {
 		this.getLocalStream();
+		BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
 
 		await storage.getItem(storage.keys.accessToken).then((accessToken) => {
 			this.setState({accessToken})
@@ -71,7 +72,12 @@ export default class MainAppScreen extends Component {
 
 	componentWillUnmount() {
 		this.handleLeave()
+		BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
 	}
+	  handleBackButton() {
+        ToastAndroid.show('Back button is pressed', ToastAndroid.SHORT);
+        return true;
+    }
 
 	getLocalStream = () => {
 		webRTCServices.getLocalStream(true, (stream) => {
