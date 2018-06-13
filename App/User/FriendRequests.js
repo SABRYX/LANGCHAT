@@ -145,7 +145,6 @@ export default class FriendRequest extends Component {
     }
 
     onBackPressed = () => {
-        console.log('UserFriends', Actions.currentScene)
         if (this.state.screen != 1) {
             this.setState({ screen: 1, currentFriend: null })
             return false
@@ -158,16 +157,21 @@ export default class FriendRequest extends Component {
     render() {
         return (
             <Container style={{ backgroundColor: 'white', flex: 1 }}>
+        <Header style={{ marginTop: 20 }} noShadow>
+            <Left>
+                <Button transparent onPress={() =>this.props.navigation.navigate("UserFriends")}>
+                    <Icon name='arrow-back' />
+                </Button>
+            </Left>
+            <Body>
+                <Title></Title>
+            </Body>
+        </Header>
+            <Content style={{ backgroundColor: 'white', flex: 1 }}>
+           
                 {this.renderBody()}
-                {
-                    this.state.screen != 1 ? (
-                        <UserChat
-                            ref={(ref) => { this.state.userChatRef = ref; }}
-                            data={{ friend_id: this.state.currentFriend.user.id, friend_name: this.state.currentFriend.user.name }} />
-                    )
-                        :
-                        null
-                }
+                
+                </Content>
             </Container>
         )
     }

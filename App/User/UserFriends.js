@@ -184,6 +184,11 @@ export default class UserFriends extends Component {
             <Body>
                 <Title></Title>
             </Body>
+            <Right>
+                <Button transparent onPress={() =>this.props.navigation.navigate("FriendRequest")}>
+                    <Icon name='arrow-back' />
+                </Button>
+            </Right>
         </Header>
             <Content style={{ backgroundColor: 'white', flex: 1 }}>
                 {
