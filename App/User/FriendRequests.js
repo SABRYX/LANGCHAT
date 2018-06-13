@@ -3,7 +3,7 @@ import { View, Image, ScrollView, BackHandler, TouchableOpacity } from 'react-na
 import { Actions } from 'react-native-router-flux';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
-    Title, Text, Form, Toast, Spinner, List, ListItem, Thumbnail, Badge
+    Title, Text, Form, Spinner, List, ListItem, Thumbnail, Badge
 } from 'native-base';
 import ImageLoad from 'react-native-image-placeholder';
 import config from "../../src/config/app.js";

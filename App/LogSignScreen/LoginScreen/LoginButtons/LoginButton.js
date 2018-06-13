@@ -8,6 +8,9 @@ import storage from '../../../services/storage';
 import { globals } from "../../../services/globals";
 
 export default class LoginButton extends Component {
+	componentDidMount(){
+		const navigation = this.props.navigation
+	}
 	constructor() {
 		super();
 		this.state = {
@@ -23,7 +26,7 @@ export default class LoginButton extends Component {
 	}
 
 	moveToMainAppScreen = () => {
-		Actions.push('mainAppScreen');
+		this.props.navigation.navigate("MainAppScreen");
 	};
 
 	errorParser(error){

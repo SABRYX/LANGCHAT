@@ -15,6 +15,9 @@ export default class LoginScreen extends Component {
       loginErrorMessage: ''
     };
   }
+  componentWillMount(){
+    const navigation = this.props.navigation;
+  }
 
   changeInputFocus = index => () => {
     if (index === 0) {
@@ -87,6 +90,7 @@ export default class LoginScreen extends Component {
           clear={this.clearAllInputs}
           move={this.props.move}
           postErrorMessage={this.postErrorMessage.bind(this)}
+          navigation={this.props.navigation}
         />
       </Animatable.View>
     );

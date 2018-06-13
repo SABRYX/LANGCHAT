@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, TouchableHighlight, View, ListView, Image, TextInput, DeviceEventEmitter,BackHandler } from 'react-native';
+import { StyleSheet, TouchableHighlight, View, ListView, Image, TextInput, DeviceEventEmitter,BackHandler,TouchableOpacity } from 'react-native';
 import { RTCView } from 'react-native-webrtc';
 import { Button, Text, Icon, Spinner } from 'native-base';
 import Thumbnails from "../../src/components/Thumbnails.js";
@@ -75,7 +75,6 @@ export default class MainAppScreen extends Component {
 		BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
 	}
 	  handleBackButton() {
-        ToastAndroid.show('Back button is pressed', ToastAndroid.SHORT);
         return true;
     }
 
@@ -112,13 +111,13 @@ export default class MainAppScreen extends Component {
 				: null
 			}
 			
-			<TouchableHighlight style={styles.profileIcon} onPress={() => Actions.push('userSettings')}>
+			<TouchableOpacity style={styles.profileIcon} onPress={() => this.props.navigation.navigate("UserSettings")}>
 				<Icon style={{color: 'white', fontSize: 35}} name="md-contact" />
-			</TouchableHighlight>
+			</TouchableOpacity>
 
-			<TouchableHighlight style={styles.friendsIcon} onPress={() => {Actions.push('containerOfTabs');console.log("holahola")}}>
+			<TouchableOpacity style={styles.friendsIcon} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
 				<Icon style={{color: 'white', fontSize: 35}} name="md-contacts" />
-			</TouchableHighlight>
+			</TouchableOpacity>
 
 			{this.renderJoinContainer()}
 			
@@ -144,7 +143,7 @@ export default class MainAppScreen extends Component {
 	renderJoinContainer() {
 		if (this.state.streams.length <= 1) {
 			return <View style={[styles.joinContainer]}>
-				<Pulse color='#26A65B' numPulses={2} diameter={300} speed={20} duration={2000} />
+				<Pulse color='#6ae4e0' numPulses={3} diameter={300} speed={20} duration={2000} />
 				<TouchableHighlight style={styles.joinButton} activeOpacity={0}
 					onPress={this.handleJoinClick.bind(this)}>
 					{

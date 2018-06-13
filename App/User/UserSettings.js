@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, Image, ScrollView } from 'react-native';
-import { Actions } from 'react-native-router-flux';
-import { Container, Header, Left, Body, Right, Button, Icon, Title, Text, Form, Toast, Spinner } from 'native-base';
+import { Container, Header, Left, Body, Right, Button, Icon, Title, Text, Form, Spinner } from 'native-base';
 import config from "../../src/config/app.js";
 import styles from "../../style/app.js";
 import storage from '../services/storage'
@@ -51,7 +50,7 @@ export default class UserSettings extends Component {
     logOut = async () => {
         api.logout(accessToken).then(() => {
             storage.removeItem(storage.keys.accessToken);
-            Actions.push('logSignScreen');      
+            this.props.navigation.navigate("LogSignScreen")    
         });
     };
 
@@ -70,16 +69,7 @@ export default class UserSettings extends Component {
                           accessToken).then((response) => {
                               alert(JSON.stringify(response))
                             this.setState({dataLoaded: 'done'})
-                            if (response.type == "success")
-                                Toast.show({
-                                    text: 'Account updated successfully!',
-                                    buttonText: 'Okay'
-                                })
-                            else
-                                Toast.show({
-                                    text: 'Please try again!',
-                                    buttonText: 'Okay'
-                                })
+                            
 
                             this.state.inputs[0].changeText(response.data.name)
                             this.state.inputs[2].setSelectedItems(response.data.languages)
@@ -90,10 +80,7 @@ export default class UserSettings extends Component {
                             })
                           })
                           .catch(() => {
-                            Toast.show({
-                                text: 'Please try again!',
-                                buttonText: 'Okay'
-                            })
+                            
                           })
     }
 
@@ -102,7 +89,7 @@ export default class UserSettings extends Component {
             <Container style={{ backgroundColor: 'white' }}>
                 <Header style={{marginTop: 15}} noShadow>
                     <Left>
-                        <Button transparent onPress={() => Actions.pop()}>
+                        <Button transparent onPress={() =>this.props.navigation.goBack(null)}>
                             <Icon name='arrow-back' />
                         </Button>
                     </Left>

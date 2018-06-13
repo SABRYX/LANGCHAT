@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { View, Image, ScrollView, BackHandler } from 'react-native';
-import { Actions } from 'react-native-router-flux';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
-    Title, Text, Form, Toast, Spinner, List, ListItem, Thumbnail,
+    Title, Text, Form, Spinner, List, ListItem, Thumbnail,
     Tabs,Tab
 } from 'native-base';
 import ImageLoad from 'react-native-image-placeholder';
@@ -28,41 +27,35 @@ export default class containerOfTabs extends Component {
 
      componentDidMount() {
         console.log("i',m here")
-        BackHandler.addEventListener('hardwareBackPress', () => {
-            if (this.state.screen == 1) {
-                Actions.pop();
-                return true;
-            }
-            else this.setState({ screen: 1 })
-
-            return true;
-        });
+        // BackHandler.addEventListener('hardwareBackPress',this.onBackPressed());
 
   
     }
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress');
-    }
+    // componentWillUnmount() {
+    //     BackHandler.removeEventListener('hardwareBackPress');
+    // }
 
 
-    onBackPressed = () => {
-		console.log('UserFriends', Actions.currentScene)        
-        if (this.state.screen != 1) {
-            this.setState({ screen: 1, currentFriend: null })
-            return false
-        }
+    // onBackPressed = () => {       
+    //     if (this.state.currentFriend != null) {
+    //         this.props.navigation.navigate("containerOfTabs")
+    //         this.setState({ currentFriend: null })
+    //         console.log("boyaacontainer")
+    //     }
+    //     else{   
+    //         this.props.navigation.navigate("MainAppScreen")
+    //         console.log("boyaaback")
+    //     }
 
-        Actions.pop()
-        return true
-    }
+    // }
 
     render() {
         return (
             <Container style={{ backgroundColor: 'white', flex: 1 }}>
                 <Header style={{ marginTop: 15 }} noShadow hasTabs>
                     <Left>
-                        <Button transparent onPress={() => Actions.pop()}>
+                        <Button transparent onPress={() => this.onBackPressed()}>
                             <Icon name='arrow-back' />
                         </Button>
                     </Left>

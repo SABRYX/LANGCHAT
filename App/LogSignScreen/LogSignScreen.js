@@ -21,11 +21,11 @@ export default class LogSignScreen extends Component {
 	switchScreens = index => () => {
 		if (this.topTabs.state.currentTabIndex !== index) {
 			if (index === 0) {
-				this.loginScreen.animationView.fadeInLeft(600).then(this.changeZindex);
-				this.signInScreen.animationView.fadeOutRight(400);
+				this.loginScreen.animationView.fadeInLeft(60).then(this.changeZindex);
+				this.signInScreen.animationView.fadeOutRight(40);
 			} else {
-				this.loginScreen.animationView.fadeOutLeft(400);
-				this.signInScreen.animationView.fadeInRight(600).then(this.changeZindex);
+				this.loginScreen.animationView.fadeOutLeft(40);
+				this.signInScreen.animationView.fadeInRight(60).then(this.changeZindex);
 			}
 			this.topTabs.state.tabsStyles.reverse();
 			this.topTabs.setState({ currentTabIndex: index });
@@ -33,7 +33,7 @@ export default class LogSignScreen extends Component {
 	};
 
 	moveToMainAppScreen = () => {
-		Actions.push('testMainAppScreen');
+		this.props.navigation.navigate("MainAppScreen")
 	};
 
 	showSettings = () => {
@@ -80,10 +80,12 @@ export default class LogSignScreen extends Component {
 						move={this.moveToMainAppScreen}
 						scroll={this.scrollToTextInput}
 						ref={(ref) => { this.signInScreen = ref; }}
+						navigation={this.props.navigation}
 					/>
 					<LoginScreen
 						move={this.moveToMainAppScreen}
 						ref={(ref) => { this.loginScreen = ref; }}
+						navigation={this.props.navigation}
 					/>
 				</View>
 				{/* <SettingsButton show={this.showSettings} />

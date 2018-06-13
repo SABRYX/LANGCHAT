@@ -73,7 +73,7 @@ export default StyleSheet.create({
     height: 80,
     marginTop: 10,
     borderRadius: 100,
-    backgroundColor: "#26A65B"
+    backgroundColor: "#6ae4e0"
   },
   joinButtonText: {
     color: "white",

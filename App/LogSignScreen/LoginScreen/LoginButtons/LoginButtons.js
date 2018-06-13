@@ -7,6 +7,9 @@ import GoogleButton from './GoogleButton';
 import FacebookButton from './FacebookButton';
 
 export default class LoginButtons extends Component {
+  componentWillMount(){
+    const navigation = this.props.navigation;
+  }
   render() {
     if (GLOBAL.appLoginStyle === 0) {
       return (
@@ -14,7 +17,9 @@ export default class LoginButtons extends Component {
           <LoginButton 
           clear={this.props.clear} 
           postErrorMessage={this.props.postErrorMessage}
-          ref={(ref) => { this.loginButton = ref; }} />
+          ref={(ref) => { this.loginButton = ref; }}
+          navigation={this.props.navigation}
+          />
           <GoogleButton />
           <GuestButton move={this.props.move} />
         </View>
@@ -25,7 +30,9 @@ export default class LoginButtons extends Component {
           <LoginButton 
           clear={this.props.clear} 
           postErrorMessage={this.props.postErrorMessage}
-          ref={(ref) => { this.loginButton = ref; }} />
+          ref={(ref) => { this.loginButton = ref; }} 
+          navigation={this.props.navigation}
+          />
           <FacebookButton />
           <GuestButton move={this.props.move} />
         </View>
@@ -37,7 +44,9 @@ export default class LoginButtons extends Component {
           <LoginButton 
           clear={this.props.clear} 
           postErrorMessage={this.props.postErrorMessage}
-          ref={(ref) => { this.loginButton = ref; }} />
+          ref={(ref) => { this.loginButton = ref; }} 
+          navigation={this.props.navigation}
+          />
         </View>
       );
     }
@@ -46,7 +55,9 @@ export default class LoginButtons extends Component {
         <LoginButton 
         clear={this.props.clear} 
         postErrorMessage={this.props.postErrorMessage}
-        ref={(ref) => { this.loginButton = ref; }} />
+        ref={(ref) => { this.loginButton = ref; }}
+        navigation={this.props.navigation}
+        />
         <GuestButton move={this.props.move} />
         <View style={{ flexDirection: 'row', marginTop: height / 100 }}>
           <FacebookButton special />

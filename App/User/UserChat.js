@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Image, ScrollView, TouchableOpacity,BackHandler } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
-    Title, Text, Form, Toast, Spinner, List, ListItem, Thumbnail
+    Title, Text, Form, Spinner, List, ListItem, Thumbnail
 } from 'native-base';
 import config from "../../src/config/app.js";
 import styles from "../../style/app.js";
@@ -23,7 +23,7 @@ export default class UserChat extends Component {
             friend_name: this.props.data.friend_name,
             friend_id: this.props.data.friend_id,
             chatRef: null,
-            page: 1
+            page: 0
         }
     }
 
@@ -44,6 +44,10 @@ export default class UserChat extends Component {
         //     this.loadMessages(null)
         // }
         this.loadMessages(null)
+        BackHandler.addEventListener('hardwareBackPress', () => {
+           console.log("hhhhhhhhhh2");
+           this.props.action
+        })
     }
 
     async loadMessages(messages) {
@@ -66,7 +70,7 @@ export default class UserChat extends Component {
                 // else data = response.data
 
                 this.setState(previousState => ({
-                    messages: GiftedChat.prepend(previousState.messages, response.data),
+                    messages: GiftedChat.append(previousState.messages, response.data),
                     page: this.state.page + 1
                 }))
             })
@@ -101,7 +105,7 @@ export default class UserChat extends Component {
             <TouchableOpacity onPress={() => {
                 if (props.text.trim().length > 0)
                     this.state.chatRef.onSend({ text: props.text.trim() }, true)
-            }} style={{ position: 'absolute', top: 0, right: 0, padding: 10 }}>
+            }} style={{ position: 'absolute', top: 0, right: 0, }}>
                 <Icon name="send" style={{ color: props.text.trim().length > 0 ? "#3f51b5" : "#efefef" }} />
             </TouchableOpacity>
         );
@@ -109,19 +113,11 @@ export default class UserChat extends Component {
 
     render() {
         return (
-            // <Container style={{ backgroundColor: 'white', flex: 1 }}>
-            //     <Header style={{ marginTop: 15 }} noShadow>
-            //         <Left>
-            //             <Button transparent onPress={() => Actions.pop()}>
-            //                 <Icon name='arrow-back' />
-            //             </Button>
-            //         </Left>
-            //         <Body>
-            //             <Title>{this.state.friend_name}</Title>
-            //         </Body>
-            //     </Header>
+             <Container style={{ backgroundColor: 'white', flex: 1, }}>
+
             <GiftedChat
                 messages={this.state.messages}
+                isInitialized= {true}
                 onSend={messages => this.onSend(messages)}
                 loadEarlier={true}
                 onLoadEarlier={() => this.loadMessages(null)}
@@ -132,7 +128,7 @@ export default class UserChat extends Component {
                     avatar: globals.user.avatar
                 }}
             />
-            // </Container>
+             </Container>
         )
     }
 }

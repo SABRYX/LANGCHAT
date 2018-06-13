@@ -23,22 +23,31 @@ export default class UserFriends extends Component {
             dataLoaded: "Loading",
             friends: [],
             currentFriend: null,
-            userChatRef: null
+            userChatRef: null,
+            last_message:null,
+            messageWritten:null,
         }
+        this.backToChat=this.backToChat.bind(this)
+    }
+    componentWillMount(){
+        this.getMessagesMain();
     }
 
      componentDidMount() {
         console.log("hola")
         BackHandler.addEventListener('hardwareBackPress', () => {
-            if (this.state.screen == 1) {
-                Actions.pop();
-                return true;
+            if (this.state.screen == 2) {
+                
+                this.backToChat();
             }
-            else this.setState({ screen: 1 })
+            else {this.props.navigation.navigate("MainAppScreen")}
 
             return true;
         });
 
+        
+    }
+    getMessagesMain(){
         storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
             api.get_all_friends(result).then((response) => {
@@ -76,52 +85,58 @@ export default class UserFriends extends Component {
             }
             else this.state.userChatRef.updateMessage(data)
         })
+
     }
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress');
+    wordWrittenGenerator(){
+            if(this.state.last_message == undefined){
+                this.setState({messageWritten:"Wanna start a conversation"})
+                console.log(this.state.messageWritten)
+            }
+            else{
+                this.setState ({messageWritten:this.state.last_message.substring(0, 30) + (this.state.last_message.length > 30 ? '...' : '')} )
+                console.log(this.state.messageWritten);
+            }
     }
 
     renderBody() {
-        console.log(this.state.dataLoaded)
         if (this.state.screen == 1) {
             return(
                 
-                <Content style={{ width: config.screenWidth }}>
-                    {   
-                        
+                <Content style={{ width: config.screenWidth,height:config.screenHeight,flex:1 }}>
+                    {
                         this.state.dataLoaded == "done" ? 
-                        <List style={{marginTop: 5}} dataArray={this.state.friends.sort((a,b) => {
+                        <List style={{marginTop: 0}} dataArray={this.state.friends.sort((a,b) => {
                             return new Date(b.last_message_date) - new Date(a.last_message_date);
                         })}
-                        renderRow={(friend, s1, index) =>
-                                <ListItem avatar
-                                    onPress={() => this.setState({ screen: 2, currentFriend: friend }) }
-                                    style={{ backgroundColor: friend.is_seen ? 'transparent' : '#eaf2ff' }}>
-                                            <Left>
-                                                {/* <Thumbnail source={{uri: friend.avatar}} /> */}
-                                                <ImageLoad
-                                                    style={{ width: 50, height: 50 }}
-                                                    loadingStyle={{ width: 50, height: 50 }}
-                                                    placeholderStyle={{ width: 50, height: 50, resizeMode: Image.resizeMode.stretch, borderRadius: 50 }}
-                                                    borderRadius={50}
-                                                    source={{ uri: friend.avatar }}
-                                                    placeholderSource={	require('../../assets/default_avatar.png') } />
-                                                {
-                                                    friend.is_online ? (
-                                                    <Icon name='ios-radio-button-on' style={{color:'green', position: 'absolute', bottom: 0, right: -8}} />
-                                                    ) : null
-                                                }
-                                            </Left>
-                                            <Body>
-                                                <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }}>{friend.name}</Text>
-                                                {/* <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message.substring(0, 30) + (friend.last_message.length > 30 ? '...' : '')}</Text> */}
-                                            </Body>
-                                            <Right>
-                                                <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message_time}</Text>
-                                            </Right>
-                                        </ListItem>
-                                    }>
+                            renderRow={(friend, s1, index) =>
+                                    <ListItem
+                                        onPress={() =>{ this.setState({ screen: 2, currentFriend: friend,last_message:friend.last_message });this.wordWrittenGenerator();console.log("working") /* this.props.currentFriends(friend);console.log(friend) */} }
+                                        style={{ backgroundColor: friend.is_seen ? 'transparent' : 'transparent' }}>
+                                                <Left style={{ margin: "0%", flex: 1 }}>
+                                                    {/* <Thumbnail source={{uri: friend.avatar}} /> */}
+                                                    <ImageLoad
+                                                        style={{ width: 50, height: 50 }}
+                                                        loadingStyle={{ width: 50, height: 50 }}
+                                                        placeholderStyle={{ width: 50, height: 50, resizeMode: Image.resizeMode.stretch, borderRadius: 50 }}
+                                                        borderRadius={50}
+                                                        source={{ uri: friend.avatar }}
+                                                        placeholderSource={	require('../../assets/default_avatar.png') } />
+                                                    {
+                                                        friend.is_online ? (
+                                                        <Icon name='ios-radio-button-on' style={{color:'green', position: 'absolute', bottom: 0, right: -8}} />
+                                                        ) : null
+                                                    }
+                                                </Left>
+                                                <Body style={{ marginLeft: "0%", width: 180, flex: 3 }}>
+                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }}>{friend.name}</Text>
+                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note> {this.state.messageWritten} </Text>
+                                                </Body>
+                                                <Right style={{ flexDirection: "row", flex: 2, justifyContent: "space-between" }}>
+                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message_time}</Text>
+                                                </Right>
+                                            </ListItem>
+                                        }>
                                 </List>
                         :
                         null
@@ -142,30 +157,47 @@ export default class UserFriends extends Component {
         return null;
     }
 
-    onBackPressed = () => {
-		console.log('UserFriends', Actions.currentScene)        
-        if (this.state.screen != 1) {
-            this.setState({ screen: 1, currentFriend: null })
-            return false
+    backToChat(){
+        if (this.state.screen == 2) {
+            this.setState({
+                screen: 1,
+                dataLoaded: "Loading",
+                friends: [],
+                currentFriend: null,
+                userChatRef: null,
+                last_message:null,
+                messageWritten:null,});
+            this.getMessagesMain();
+        }else{
+            this.props.navigation.goBack();
         }
-
-        Actions.pop()
-        return true
     }
 
     render() {
-        return (
-            <Container style={{ backgroundColor: 'white', flex: 1 }}>
-                {this.renderBody()}
+        return (<Container style={{ backgroundColor: 'white', flex: 1 }}>
+        <Header style={{ marginTop: 20 }} noShadow>
+            <Left>
+                <Button transparent onPress={() =>this.backToChat()}>
+                    <Icon name='arrow-back' />
+                </Button>
+            </Left>
+            <Body>
+                <Title></Title>
+            </Body>
+        </Header>
+            <Content style={{ backgroundColor: 'white', flex: 1 }}>
                 {
                     this.state.screen != 1 ? (
                         <UserChat
                             ref={(ref) => { this.state.userChatRef = ref; }}
-                            data={{ friend_id: this.state.currentFriend.id, friend_name: this.state.currentFriend.name }} />
+                            data={{ friend_id: this.state.currentFriend.id, friend_name: this.state.currentFriend.name }} 
+                            action={this.backToChat}
+                            />
                     )
                     :
-                    null
+                    this.renderBody()
                 }
+                </Content>
             </Container>
         )
     }
