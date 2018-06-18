@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { View, Image, ScrollView, BackHandler } from 'react-native';
-import { Actions } from 'react-native-router-flux';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
-    Title, Text, Form, Toast, Spinner, List, ListItem, Thumbnail
+    Title, Text, Spinner, List, ListItem,
 } from 'native-base';
 import ImageLoad from 'react-native-image-placeholder';
 import config from "../../src/config/app.js";
@@ -12,6 +11,7 @@ import storage from '../services/storage'
 import api from '../services/api';
 import {globals} from "../services/globals";
 import UserChat from "./UserChat";
+import IconBadge from 'react-native-icon-badge';
 
 export default class UserFriends extends Component {
     accessToken;
@@ -26,37 +26,44 @@ export default class UserFriends extends Component {
             userChatRef: null,
             last_message:null,
             messageWritten:null,
+            BadgeCount:1,
+            useBackButton:true,
         }
-        this.backToChat=this.backToChat.bind(this)
     }
     componentWillMount(){
         this.getMessagesMain();
-    }
-
-     componentDidMount() {
-        console.log("hola")
         BackHandler.addEventListener('hardwareBackPress', () => {
-            if (this.state.screen == 2) {
-                
-                this.backToChat();
-            }
-            else {this.props.navigation.navigate("MainAppScreen")}
-
-            return true;
-        });
-
+            if(this.state.useBackButton||this.state.screen==1){
+             this.props.navigation.goBack()
+             console.log("wentBack")
+             return true;
+            }else {this.getMessagesMain();this.setState({screen:1});}
+          });
         
     }
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress');
+    }
+    componentDidMount(){
+       
+
+         this.wordWrittenGenerator();
+    }
+
     getMessagesMain(){
         storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
+            if (this.state.friends = []){
+
             api.get_all_friends(result).then((response) => {
                 response.data.forEach(element => {
                    this.state.friends.push(element.friend)
                 });
+
                 console.log(this.state.friends)
                 this.setState({ screen: 1, dataLoaded: "done" })
             })
+        }
         })
 
         console.log(globals.mainSocket)
@@ -90,7 +97,7 @@ export default class UserFriends extends Component {
 
     wordWrittenGenerator(){
             if(this.state.last_message == undefined){
-                this.setState({messageWritten:"Wanna start a conversation"})
+                this.setState({messageWritten:"Start a conversation"})
                 console.log(this.state.messageWritten)
             }
             else{
@@ -111,7 +118,7 @@ export default class UserFriends extends Component {
                         })}
                             renderRow={(friend, s1, index) =>
                                     <ListItem
-                                        onPress={() =>{ this.setState({ screen: 2, currentFriend: friend,last_message:friend.last_message });this.wordWrittenGenerator();console.log("working") /* this.props.currentFriends(friend);console.log(friend) */} }
+                                        onPress={() =>{ this.setState({ screen: 2, currentFriend: friend,last_message:friend.last_message,useBackButton:false });console.log("working") /* this.props.currentFriends(friend);console.log(friend) */} }
                                         style={{ backgroundColor: friend.is_seen ? 'transparent' : 'transparent' }}>
                                                 <Left style={{ margin: "0%", flex: 1 }}>
                                                     {/* <Thumbnail source={{uri: friend.avatar}} /> */}
@@ -157,27 +164,17 @@ export default class UserFriends extends Component {
         return null;
     }
 
-    backToChat(){
-        if (this.state.screen == 2) {
-            this.setState({
-                screen: 1,
-                dataLoaded: "Loading",
-                friends: [],
-                currentFriend: null,
-                userChatRef: null,
-                last_message:null,
-                messageWritten:null,});
-            this.getMessagesMain();
-        }else{
-            this.props.navigation.goBack();
-        }
+    backToChat=()=>{
+         this.getMessagesMain();
+         console.log("here is backtochat")
     }
+
 
     render() {
         return (<Container style={{ backgroundColor: 'white', flex: 1 }}>
         <Header style={{ marginTop: 20 }} noShadow>
             <Left>
-                <Button transparent onPress={() =>this.backToChat()}>
+                <Button transparent onPress={() =>this.props.navigation.goBack()}>
                     <Icon name='arrow-back' />
                 </Button>
             </Left>
@@ -185,8 +182,20 @@ export default class UserFriends extends Component {
                 <Title></Title>
             </Body>
             <Right>
-                <Button transparent onPress={() =>this.props.navigation.navigate("FriendRequest")}>
-                    <Icon name='arrow-back' />
+                <Button transparent onPress={() =>{
+                        this.props.navigation.navigate('FriendRequest', { onNavigateBack: this.backToChat});
+                        this.setState({ 
+                            screen: 1,
+                            dataLoaded: "Loading",
+                            friends: [],
+                            currentFriend: null,
+                            userChatRef: null,
+                            last_message:null,
+                            messageWritten:null,
+                            BadgeCount:1,
+                            useBackButton:true,
+                            })}}>
+                        <Icon name='user-follow' type="SimpleLineIcons" />
                 </Button>
             </Right>
         </Header>
@@ -196,7 +205,6 @@ export default class UserFriends extends Component {
                         <UserChat
                             ref={(ref) => { this.state.userChatRef = ref; }}
                             data={{ friend_id: this.state.currentFriend.id, friend_name: this.state.currentFriend.name }} 
-                            action={this.backToChat}
                             />
                     )
                     :

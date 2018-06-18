@@ -31,7 +31,8 @@ export default class FriendRequest extends Component {
         console.log("hola")
         BackHandler.addEventListener('hardwareBackPress', () => {
             if (this.state.screen == 1) {
-                Actions.pop();
+                this.props.navigation.state.params.onNavigateBack()
+                this.props.navigation.goBack()
                 return true;
             }
             else this.setState({ screen: 1 })
@@ -55,8 +56,8 @@ export default class FriendRequest extends Component {
 
     removeRequestFromUI(requestNumber) {
         var index = requestNumber;
-        // this.state.friends.splice(index,1);
-        delete this.state.friends[index]
+        this.state.friends.splice(index,1);
+        // delete this.state.friends[index]
         // console.log(requestNumber);
         this.setState({ friends: this.state.friends })
 
@@ -133,7 +134,7 @@ export default class FriendRequest extends Component {
                         this.state.dataLoaded != "done" ?
                             <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: config.screenWidth, height: config.screenHeight - 80 }}>
                                 <Spinner />
-                                <Text style={{ color: '#666', fontSize: 12, fontWeight: "bold", marginTop: 10 }}>{this.state.dataLoaded} messages...</Text>
+                                <Text style={{ color: '#666', fontSize: 12, fontWeight: "bold", marginTop: 10 }}>{this.state.dataLoaded} Friend Requests...</Text>
                             </View>
                             :
                             null
@@ -144,22 +145,21 @@ export default class FriendRequest extends Component {
         return null;
     }
 
-    onBackPressed = () => {
-        if (this.state.screen != 1) {
-            this.setState({ screen: 1, currentFriend: null })
-            return false
-        }
 
-        Actions.pop()
-        return true
-    }
 
     render() {
         return (
             <Container style={{ backgroundColor: 'white', flex: 1 }}>
         <Header style={{ marginTop: 20 }} noShadow>
             <Left>
-                <Button transparent onPress={() =>this.props.navigation.navigate("UserFriends")}>
+                <Button transparent onPress={() =>{
+                    if (this.state.screen == 1) {
+                        // this.props.navigation.state.params.onNavigateBack()
+                        this.props.navigation.goBack()
+                        return true;
+                    }
+                    else this.setState({ screen: 1 })
+                    }}>
                     <Icon name='arrow-back' />
                 </Button>
             </Left>

@@ -10,7 +10,6 @@ import config from "../../src/config/app.js";
 import InCallManager from 'react-native-incall-manager';
 import storage from '../services/storage'
 import webRTCServices from '../../src/lib/services.js';
-import { Actions } from 'react-native-router-flux';
 import {Dimensions} from 'react-native';
 import Pulse from 'react-native-pulse';
 import Colors from '../AppGlobalConfig/Colors/Colors';
@@ -55,7 +54,7 @@ export default class MainAppScreen extends Component {
 					api.logout(accessToken).then(() => {
 						storage.removeItem(storage.keys.accessToken)
 						storage.clear()
-						Actions.push('logSignScreen')
+						this.props.navigation.navigate("LogSignScreen")
 					})
 				}
 				else {
@@ -112,11 +111,11 @@ export default class MainAppScreen extends Component {
 			}
 			
 			<TouchableOpacity style={styles.profileIcon} onPress={() => this.props.navigation.navigate("UserSettings")}>
-				<Icon style={{color: 'white', fontSize: 35}} name="md-contact" />
+				<Icon style={{color: 'white', fontSize: 35}} name="account-settings"  type="MaterialCommunityIcons"/>
 			</TouchableOpacity>
 
 			<TouchableOpacity style={styles.friendsIcon} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
-				<Icon style={{color: 'white', fontSize: 35}} name="md-contacts" />
+				<Icon style={{color: 'white', fontSize: 35}} name="chat"  type="Entypo"/>
 			</TouchableOpacity>
 
 			{this.renderJoinContainer()}

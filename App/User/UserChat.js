@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { View, Image, ScrollView, TouchableOpacity,BackHandler } from 'react-native';
-import { Actions } from 'react-native-router-flux';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
     Title, Text, Form, Spinner, List, ListItem, Thumbnail
@@ -18,6 +17,7 @@ export default class UserChat extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            screen: 2,
             dataLoaded: "Loading",
             messages: [],
             friend_name: this.props.data.friend_name,
@@ -46,8 +46,12 @@ export default class UserChat extends Component {
         this.loadMessages(null)
         BackHandler.addEventListener('hardwareBackPress', () => {
            console.log("hhhhhhhhhh2");
-           this.props.action
+        //    this.props.action;
+           this.setState({screen:1})
         })
+    }
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress');
     }
 
     async loadMessages(messages) {
