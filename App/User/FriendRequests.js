@@ -154,7 +154,7 @@ export default class FriendRequest extends Component {
             <Left>
                 <Button transparent onPress={() =>{
                     if (this.state.screen == 1) {
-                        // this.props.navigation.state.params.onNavigateBack()
+                        this.props.navigation.state.params.onNavigateBack()
                         this.props.navigation.goBack()
                         return true;
                     }

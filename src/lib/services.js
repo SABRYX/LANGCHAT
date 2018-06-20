@@ -6,6 +6,7 @@ let onFriendLeftCallback = null;
 let onLeave = null;
 let onFriendConnectedCallback = null;
 let onDataChannelMessageCallback = null;
+let onFriendRequsted = null;
 
 const socketIOClient = require('socket.io-client');
 let socket = socketIOClient('http://192.168.1.30:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
@@ -163,6 +164,17 @@ socket.on("join", function (friend) {
 	console.log("New friend joint conversation: ", friend);
 });
 
+socket.on('custom_message', function (data) {
+	if(data.type == 'friend_request') {
+		if(data.friend_id == myId){
+			if (onFriendRequsted != null) {
+				onFriendRequsted(JSON.parse(data));
+			}
+		}
+	 }
+	console.log(data)
+});
+
 function logError(error) {
 	console.log("logError", error);
 }
@@ -232,6 +244,7 @@ function join(roomId, name, callbacks) {
 	onLeave = callbacks.leave;
 	onFriendConnectedCallback = callbacks.friendConnected;
 	onDataChannelMessageCallback = callbacks.dataChannelMessage;
+	onFriendRequsted=callbacks.onFriendRequsted;
 	socket.emit('join', { roomId, name }, function (result) {
 		friends = result;
 		console.log('Joins', friends);

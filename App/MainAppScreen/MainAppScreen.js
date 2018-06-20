@@ -39,14 +39,14 @@ export default class MainAppScreen extends Component {
 			joinState: "ready", //joining, joined
 			name: "",
 			hideInfo: false,
-			accessToken: ''
+			accessToken: '',
+			alreadyFriends:false,
+			friendRequsted:null,
 		}
 	}
 
-	async componentDidMount() {
+	async componentWillMount() {
 		this.getLocalStream();
-		BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
-
 		await storage.getItem(storage.keys.accessToken).then((accessToken) => {
 			this.setState({accessToken})
 			api.refresh(accessToken).then((response) => {
@@ -68,13 +68,18 @@ export default class MainAppScreen extends Component {
 			})
         })
 	}
-
+	componentDidMount(){
+		console.log(this.state.accessToken)
+		BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
+	}
 	componentWillUnmount() {
-		this.handleLeave()
-		BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+		this.handleLeave();
+		BackHandler.removeEventListener('hardwareBackPress', ()=> {return this.handleBackButton()});
 	}
 	  handleBackButton() {
-        return true;
+		  console.log(this.state.accessToken)
+		  this.handleLeave();
+		  BackHandler.exitApp();
     }
 
 	getLocalStream = () => {
@@ -111,7 +116,7 @@ export default class MainAppScreen extends Component {
 			}
 			
 			<TouchableOpacity style={styles.profileIcon} onPress={() => this.props.navigation.navigate("UserSettings")}>
-				<Icon style={{color: 'white', fontSize: 35}} name="account-settings"  type="MaterialCommunityIcons"/>
+				<Icon style={{color: 'white', fontSize: 35}} name="account-circle"  type="MaterialIcons"/>
 			</TouchableOpacity>
 
 			<TouchableOpacity style={styles.friendsIcon} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
@@ -131,6 +136,7 @@ export default class MainAppScreen extends Component {
 				</View>
 				: null
 			}
+			{this.renderFriendStates()}
         </View>
       );
     }
@@ -161,6 +167,54 @@ export default class MainAppScreen extends Component {
 			</View>
 		}
 		return null;
+	}
+	renderFriendStates(){
+		console.log(this.state.joinState)
+		if (this.state.joinState=="joined"){
+			return(
+			this.state.alreadyFriends ?
+			<View style={[styles.friendsContainer]}>
+				<TouchableOpacity style={styles.alreadyFriendsButton} activeOpacity={0}
+					onPress={alert("you are already friends")}>
+						<Icon style={{color: 'white', fontSize: 50}} name="check-circle" type="Feather" />
+				</TouchableOpacity>
+			</View>
+			:
+			this.handleSendFriendRequest()
+				)
+			}
+	}
+	handleSendFriendRequest(){
+		if(this.state.alreadyFriends==false){
+			if(this.state.friendRequsted){
+				return(
+					<View style={[styles.friendsContainer]}>
+						<TouchableOpacity style={styles.waitingFriendButton} activeOpacity={0}
+							onPress={()=>{alert("pending");}}>
+								<Icon style={{color: 'white', fontSize: 50}} name="send" type="FontAwesome" />
+						</TouchableOpacity>
+					</View>
+				)
+			}else if(this.state.friendRequsted == false){
+				return(
+					<View style={[styles.friendsContainer]}>
+						<TouchableOpacity style={styles.addFriendButton} activeOpacity={0}
+							onPress={()=>{alert("added");this.setState({friendRequsted:true})}}>
+								<Icon style={{color: 'white', fontSize: 50}} name="person-add" type="MaterialIcons" />
+						</TouchableOpacity>
+					</View>
+				)
+			}else if (this.state.friendRequstedFromOtherUser){
+					<View style={[styles.friendsContainer]}>
+						<TouchableOpacity style={styles.friendRequstedFromOtherUser} activeOpacity={0}
+							onPress={()=>{alert("you accepted friend Request");this.setState({alreadyFriends:true})}}>
+								<Icon style={{color: 'white', fontSize: 50}} name="call-received" type="MaterialIcons" />
+						</TouchableOpacity>
+					</View>
+			}
+		
+		}
+	
 	}
 
 	handleSetActive(streamId) {
@@ -193,6 +247,7 @@ export default class MainAppScreen extends Component {
 			friendConnected: this.handleFriendConnected.bind(this),
 			friendLeft: this.handleFriendLeft.bind(this),
 			dataChannelMessage: this.handleDataChannelMessage.bind(this),
+			onFriendRequsted:this.onFriendRequsted.bind(this),
 			leave: this.handleLeave.bind(this)
 		}
 
@@ -239,6 +294,17 @@ export default class MainAppScreen extends Component {
 			this.handleSetActive(socketId)
 		}
 	}
+
+	
+	addingFriend(){
+		this.globals.mainSocket.emit("custom_message", { type: 'friend_request', data: { friend_id: 0 } })
+	}
+	onFriendRequsted(data){
+		this.setState({friendRequsted:true});
+		console.log(data)
+	}
+
+
 
 	handleDataChannelMessage(message) {}
 }

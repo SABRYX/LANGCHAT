@@ -89,14 +89,70 @@ export default StyleSheet.create({
   },
   profileIcon: {
     position: "absolute",
-    top: 25,
-    right: 15,
+    top: 30,
+    right: 18,
     zIndex: 2
   },
   friendsIcon: {
     position: "absolute",
-    top: 25,
-    left: 15,
+    top: 30,
+    left: 18,
     zIndex: 2
+  },
+  friendsContainer:{
+    position: "absolute",
+    top: 30,
+    left: 0,
+    right:10,
+    width: config.screenWidth,
+    height: config.screenHeight,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+    paddingTop: 15,
+    //borderWidth: 1, borderColor: "white"
+  },
+  alreadyFriendsButton:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    marginTop: 70,
+    borderRadius: 100,
+    backgroundColor: "green"
+  },
+  waitingFriendButton:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    marginTop: 70,
+    borderRadius: 100,
+    backgroundColor: "orange"
+  },
+  addFriendButton:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    marginTop: 70,
+    borderRadius: 100,
+    backgroundColor: "blue"
+  },
+  friendRequstedFromOtherUser:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    marginTop: 70,
+    borderRadius: 100,
+    backgroundColor: "red"
   }
+
 });

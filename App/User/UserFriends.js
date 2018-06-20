@@ -31,7 +31,12 @@ export default class UserFriends extends Component {
         }
     }
     componentWillMount(){
-        this.getMessagesMain();
+        this.getMessagesMain(); 
+    }
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress');
+    }
+    componentDidMount(){
         BackHandler.addEventListener('hardwareBackPress', () => {
             if(this.state.useBackButton||this.state.screen==1){
              this.props.navigation.goBack()
@@ -39,15 +44,6 @@ export default class UserFriends extends Component {
              return true;
             }else {this.getMessagesMain();this.setState({screen:1});}
           });
-        
-    }
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress');
-    }
-    componentDidMount(){
-       
-
-         this.wordWrittenGenerator();
     }
 
     getMessagesMain(){
@@ -92,7 +88,7 @@ export default class UserFriends extends Component {
             }
             else this.state.userChatRef.updateMessage(data)
         })
-
+        this.wordWrittenGenerator();
     }
 
     wordWrittenGenerator(){
