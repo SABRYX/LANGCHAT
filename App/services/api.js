@@ -57,8 +57,8 @@ const api =  {
     get_room: async (accessToken) => {
         return await apiFetch(config.urls.get_room, methods.post, null, accessToken);
     },
-    leave_room: async (accessToken) => {
-        return await apiFetch(config.urls.leave_room, methods.post, null, accessToken);
+    leave_room: async (accessToken,to) => {
+        return await apiFetch(config.urls.leave_room, methods.post,JSON.stringify({ friend_id: to }), accessToken);
     },
     get_all_friends: async (accessToken) => {
         return await apiFetch(config.urls.get_all_friends, methods.get, null, accessToken);

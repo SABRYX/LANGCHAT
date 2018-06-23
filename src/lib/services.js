@@ -1,6 +1,8 @@
 import WebRTC from 'react-native-webrtc';
 import config from "../config/app.js";
 import {globals} from "../../App/services/globals.js";
+import api from '../../App/services/api';
+
 
 let onFriendLeftCallback = null;
 let onLeave = null;
@@ -16,6 +18,7 @@ var peerConnections = {}; //map of {socketId: socket.io id, RTCPeerConnection}
 let localStream = null;
 let friends = null; //list of {socketId, name}
 let me = null; //{socketId, name}
+let myId = null;
 
 function createPeerConnection(friend, isOffer, onDataChannelMessage) {
 	let socketId = friend.socketId;
@@ -132,25 +135,14 @@ function exchange(data) {
 	}
 }
 
-function leave(socketId) {
-	console.log('leave', socketId);
-	var pc = peerConnections[socketId];
-	pc.close();
-	delete peerConnections[socketId];
-	if (onFriendLeftCallback != null) {
-		onFriendLeftCallback(socketId);
-	}
-	if (onLeave != null) {
-		onLeave();
-	}
-}
+
 
 socket.on('exchange', function (data) {
 	exchange(data);
 });
 
 socket.on('leave', function (socketId) {
-	leave(socketId);
+	console.log("emitted")
 });
 
 socket.on('connect', function (data) {
@@ -165,14 +157,17 @@ socket.on("join", function (friend) {
 });
 
 socket.on('custom_message', function (data) {
+	console.log("recived a custom message")
 	if(data.type == 'friend_request') {
 		if(data.friend_id == myId){
 			if (onFriendRequsted != null) {
 				onFriendRequsted(JSON.parse(data));
 			}
 		}
+	 }else if (data.type == 'exitCall'){
+			 console.log("here",data.your_id)
+				exitCall(data.your_id);
 	 }
-	console.log(data)
 });
 
 function logError(error) {
@@ -240,8 +235,6 @@ function broadcastMessage(message) {
  *
  */
 function join(roomId, name, callbacks) {
-	onFriendLeftCallback = callbacks.friendLeft;
-	onLeave = callbacks.leave;
 	onFriendConnectedCallback = callbacks.friendConnected;
 	onDataChannelMessageCallback = callbacks.dataChannelMessage;
 	onFriendRequsted=callbacks.onFriendRequsted;
@@ -260,6 +253,27 @@ function join(roomId, name, callbacks) {
 		}
 	});
 }
+
+function exitCallFromOtherUser(accessToken,friend_id){
+	socket.emit("custom_message",{type:"exitCall",your_id:friend_id})
+	api.leave_room(accessToken,friend_id).then((response) => {
+		console.log(response)
+	})
+}
+
+function leave(socketId) {
+	console.log('leave', socketId);
+	var pc = peerConnections[socketId];
+	pc.close();
+	delete peerConnections[socketId];
+}
+
+function exitCall(socketId){ 
+	leave(socketId)
+}
+
+
+
 //------------------------------------------------------------------------------
 // Exports
 
@@ -267,5 +281,9 @@ module.exports = {
 	join,
 	countFriends,
 	getLocalStream,
-	broadcastMessage
+	broadcastMessage,
+	leave,
+	exitCallFromOtherUser,
+	exitCall
+	
 }

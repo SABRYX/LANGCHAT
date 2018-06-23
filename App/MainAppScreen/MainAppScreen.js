@@ -40,8 +40,10 @@ export default class MainAppScreen extends Component {
 			name: "",
 			hideInfo: false,
 			accessToken: '',
-			alreadyFriends:false,
+			alreadyFriends:true,
 			friendRequsted:null,
+			socketId:null,
+			friendId:null,
 		}
 	}
 
@@ -64,21 +66,25 @@ export default class MainAppScreen extends Component {
 					storage.setItem(storage.keys.name, response.user.name)
 					storage.setItem(storage.keys.user, response.user)
 					globals.user = response.user
+					webRTCServices.myId=response.user.id
+
 				}
 			})
         })
 	}
 	componentDidMount(){
-		console.log(this.state.accessToken)
 		BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
 	}
 	componentWillUnmount() {
-		this.handleLeave();
+		if (this.state.joinState === "joined" || this.state.joinState === "joining" ){
+			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);
+		  }
 		BackHandler.removeEventListener('hardwareBackPress', ()=> {return this.handleBackButton()});
 	}
 	  handleBackButton() {
-		  console.log(this.state.accessToken)
-		  this.handleLeave();
+		  if (this.state.joinState === "joined" || this.state.joinState === "joining" ){
+			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);
+		  }
 		  BackHandler.exitApp();
     }
 
@@ -169,13 +175,12 @@ export default class MainAppScreen extends Component {
 		return null;
 	}
 	renderFriendStates(){
-		console.log(this.state.joinState)
 		if (this.state.joinState=="joined"){
 			return(
 			this.state.alreadyFriends ?
 			<View style={[styles.friendsContainer]}>
 				<TouchableOpacity style={styles.alreadyFriendsButton} activeOpacity={0}
-					onPress={alert("you are already friends")}>
+					onPress={()=>{/* alert("you are already friends"); */this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId)}}>
 						<Icon style={{color: 'white', fontSize: 50}} name="check-circle" type="Feather" />
 				</TouchableOpacity>
 			</View>
@@ -219,7 +224,8 @@ export default class MainAppScreen extends Component {
 
 	handleSetActive(streamId) {
 		this.setState({
-			activeStreamId: streamId
+			activeStreamId: streamId,
+			socketId:streamId
 		});
 	}
 
@@ -245,13 +251,12 @@ export default class MainAppScreen extends Component {
 		let callbacks = {
 			joined: this.handleJoined.bind(this),
 			friendConnected: this.handleFriendConnected.bind(this),
-			friendLeft: this.handleFriendLeft.bind(this),
 			dataChannelMessage: this.handleDataChannelMessage.bind(this),
 			onFriendRequsted:this.onFriendRequsted.bind(this),
-			leave: this.handleLeave.bind(this)
 		}
 
 		api.get_room(this.state.accessToken).then((response) => {
+			this.setState({friendId:response.friend_id})
 			webRTCServices.join(response.room_token, this.state.name, callbacks);
 		})
 	}
@@ -264,20 +269,31 @@ export default class MainAppScreen extends Component {
 		});
 	}
 
-	handleLeave() {
-		api.leave_room(this.state.accessToken)
+	exitCall(accessToken,friend_id,socketId) {
+		webRTCServices.exitCallFromOtherUser(accessToken,friend_id);
+		webRTCServices.exitCall(socketId);
+		this.setState({
+			joinState: "ready", 
+		});
+		this.getLocalStream();
 	}
 
-	handleFriendLeft(socketId) {
-		let newState = {
-			streams: this.state.streams.filter(stream => stream.id != socketId)
-		}
-		if (this.state.activeStreamId == socketId) {
-			newState.activeStreamId = newState.streams[0].id;
-		}
-		this.setState(newState);
-		this.handleJoinClick()	
-	}
+
+	handleFriendLeft() {
+		this.setState({
+			activeStreamId: null,
+			streamURLs: [],
+			streams: [],
+			joinState: "ready", 
+			name: "",
+			hideInfo: false,
+			accessToken: '',
+			alreadyFriends:false,
+			friendRequsted:null,
+			socketId:null
+		});
+		this.getLocalStream();
+	} 
 
 	handleFriendConnected(socketId, stream) {
 		this.setState({
