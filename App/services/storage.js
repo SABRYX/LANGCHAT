@@ -6,6 +6,7 @@ const storage = {
         name: 'username',
         email: 'useremail',
         user: 'user',
+        id: 'id'
     },
     setItem: async function(key, value) {
         try {

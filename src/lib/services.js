@@ -2,6 +2,8 @@ import WebRTC from 'react-native-webrtc';
 import config from "../config/app.js";
 import {globals} from "../../App/services/globals.js";
 import api from '../../App/services/api';
+import { EventRegister } from 'react-native-event-listeners'
+
 
 
 let onFriendLeftCallback = null;
@@ -165,8 +167,9 @@ socket.on('custom_message', function (data) {
 			}
 		}
 	 }else if (data.type == 'exitCall'){
-			 console.log("here",data.your_id)
-				exitCall(data.your_id);
+			if (globals.user.id===data.your_id){
+				EventRegister.emitEvent('friendLeft')
+			}
 	 }
 });
 
@@ -254,8 +257,8 @@ function join(roomId, name, callbacks) {
 	});
 }
 
-function exitCallFromOtherUser(accessToken,friend_id){
-	socket.emit("custom_message",{type:"exitCall",your_id:friend_id})
+function exitCallFromOtherUser(accessToken,friend_id,callbacks){
+	socket.emit("custom_message",{type:"exitCall",your_id:friend_id,callbacks})
 	api.leave_room(accessToken,friend_id).then((response) => {
 		console.log(response)
 	})

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import * as Animatable from 'react-native-animatable';
 import { Text, Spinner, Button } from 'native-base';
-import { Actions } from 'react-native-router-flux';
 import api from '../../../services/api';
 import storage from '../../../services/storage';
 import { globals } from "../../../services/globals";
@@ -53,7 +52,8 @@ export default class LoginButton extends Component {
 						storage.setItem(storage.keys.accessToken, result.access_token);
 						storage.setItem(storage.keys.name, result.name);
 						storage.setItem(storage.keys.user, result);
-						global.user = result
+
+						globals.user = result
 
 						this.moveToMainAppScreen();
 						this.props.clear();

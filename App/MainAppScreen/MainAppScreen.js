@@ -14,6 +14,8 @@ import {Dimensions} from 'react-native';
 import Pulse from 'react-native-pulse';
 import Colors from '../AppGlobalConfig/Colors/Colors';
 import api from '../services/api';
+import { EventRegister } from 'react-native-event-listeners'
+
 
 //const sampleFullScreenURL = require("./image/sample-image-2.jpg");
 const logo = require("../../image/logo.png");
@@ -26,6 +28,10 @@ const iconWidth = (width * 52) / 100;
 const langChat = require('../../assets/langchat.png');
 const doubleTapImage = require('../../assets/double_tap.png');
 import { globals } from "../services/globals";
+const socketIOClient = require('socket.io-client');
+let socket = socketIOClient('http://192.168.1.30:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
+
+var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
 
 
 export default class MainAppScreen extends Component {
@@ -70,10 +76,25 @@ export default class MainAppScreen extends Component {
 
 				}
 			})
-        })
+		})
+		
 	}
 	componentDidMount(){
 		BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
+		socket.on('custom_message', (data) => {
+			console.log("recived a custom message")
+			if(data.type == 'friend_request') {
+				if(data.friend_id == myId){
+					if (onFriendRequsted != null) {
+						onFriendRequsted(JSON.parse(data));
+					}
+				}
+			 }else if (data.type == 'exitCall'){
+					if (globals.user.id===data.your_id){
+						this.handleFriendLeft();
+					}
+			 }
+		});
 	}
 	componentWillUnmount() {
 		if (this.state.joinState === "joined" || this.state.joinState === "joining" ){
@@ -84,8 +105,10 @@ export default class MainAppScreen extends Component {
 	  handleBackButton() {
 		  if (this.state.joinState === "joined" || this.state.joinState === "joining" ){
 			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);
+		  }else{
+			BackHandler.exitApp();
 		  }
-		  BackHandler.exitApp();
+		  
     }
 
 	getLocalStream = () => {
@@ -281,16 +304,7 @@ export default class MainAppScreen extends Component {
 
 	handleFriendLeft() {
 		this.setState({
-			activeStreamId: null,
-			streamURLs: [],
-			streams: [],
 			joinState: "ready", 
-			name: "",
-			hideInfo: false,
-			accessToken: '',
-			alreadyFriends:false,
-			friendRequsted:null,
-			socketId:null
 		});
 		this.getLocalStream();
 	} 
