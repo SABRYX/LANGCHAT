@@ -3,7 +3,7 @@ import config from "../config/app.js";
 import {globals} from "../../App/services/globals.js";
 import api from '../../App/services/api';
 import { EventRegister } from 'react-native-event-listeners'
-
+import InCallManager from 'react-native-incall-manager';
 
 
 let onFriendLeftCallback = null;
@@ -253,6 +253,8 @@ function join(roomId, name, callbacks) {
 				name: name
 			}
 			callbacks.joined();
+			InCallManager.start({media: 'audio'});
+			InCallManager.setForceSpeakerphoneOn(true);
 		}
 	});
 }

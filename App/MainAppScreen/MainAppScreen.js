@@ -279,6 +279,7 @@ export default class MainAppScreen extends Component {
 		}
 
 		api.get_room(this.state.accessToken).then((response) => {
+			console.log(response)
 			this.setState({friendId:response.friend_id})
 			webRTCServices.join(response.room_token, this.state.name, callbacks);
 		})
@@ -290,6 +291,7 @@ export default class MainAppScreen extends Component {
 		this.setState({
 			joinState: "joined"
 		});
+		
 	}
 
 	exitCall(accessToken,friend_id,socketId) {
