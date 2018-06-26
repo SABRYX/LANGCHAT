@@ -15,6 +15,7 @@ import Pulse from 'react-native-pulse';
 import Colors from '../AppGlobalConfig/Colors/Colors';
 import api from '../services/api';
 import { EventRegister } from 'react-native-event-listeners'
+import GestureRecognizer  from 'react-native-swipe-gestures'; 
 
 
 //const sampleFullScreenURL = require("./image/sample-image-2.jpg");
@@ -45,11 +46,14 @@ export default class MainAppScreen extends Component {
 			joinState: "ready", //joining, joined
 			name: "",
 			hideInfo: false,
+			gestureNotification:false,
 			accessToken: '',
-			alreadyFriends:true,
-			friendRequsted:null,
+			alreadyFriends:null,
+			friendRequest:null,
+			friendRequested:null,
 			socketId:null,
 			friendId:null,
+			friendRequstedFromId:null,
 		}
 	}
 
@@ -83,16 +87,17 @@ export default class MainAppScreen extends Component {
 		BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
 		socket.on('custom_message', (data) => {
 			console.log("recived a custom message")
-			if(data.type == 'friend_request') {
-				if(data.friend_id == myId){
-					if (onFriendRequsted != null) {
-						onFriendRequsted(JSON.parse(data));
-					}
-				}
-			 }else if (data.type == 'exitCall'){
+			if (data.type == 'exitCall'){
 					if (globals.user.id===data.your_id){
 						this.handleFriendLeft();
 					}
+			 }else if(data.type == "recieveAddFriend"){
+				 if(globals.user.id==data.data.your_id){
+					 console.log(data,"datatatatat")
+					 this.handleFriendRequested(data.data)
+				 }
+			 }else if(data.type == "acceptedFriendRequest"){
+				 this.acceptedFriendRequest();
 			 }
 		});
 	}
@@ -105,6 +110,7 @@ export default class MainAppScreen extends Component {
 	  handleBackButton() {
 		  if (this.state.joinState === "joined" || this.state.joinState === "joining" ){
 			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);
+			BackHandler.exitApp();
 		  }else{
 			BackHandler.exitApp();
 		  }
@@ -122,56 +128,96 @@ export default class MainAppScreen extends Component {
 			})
 		});
 	}
+
+	onSwipeDown(gestureState) {
+			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);		  
+	  }
+	  onSwipeRight(gestureState){
+		this.handleRejoin()
+	  }
+	
+	
   
     render() {
+		
 	  let activeStreamResult = this.state.streams.filter(stream => stream.id == this.state.activeStreamId);
 	  
       return (
+		<GestureRecognizer
+		onSwipeDown={(state) => this.onSwipeDown(state)}
+		onSwipeRight={(state) => this.onSwipeRight(state)}
+		config={{
+		  velocityThreshold: 0.3,
+		  directionalOffsetThreshold: 80
+		}}
+		style={styles.container}
+		>
         <View style={{
           backgroundColor: '#000', flex: 1, alignItems: 'center', justifyContent: 'space-between',
         }}
         >	
-            <FullScreenVideo 
-			  streamURL={activeStreamResult.length > 0 ? activeStreamResult[0].url : null}
-			  rejoin={this.handleRejoin.bind(this)}>
-			</FullScreenVideo>
-            {
-              this.state.joinState == "joined"?
-                <Thumbnails streams={this.state.streams}
-                  setActive={this.handleSetActive.bind(this)}
-				  activeStreamId={this.state.activeStreamId}
-				/>
-				: null
-			}
 			
-			<TouchableOpacity style={styles.profileIcon} onPress={() => this.props.navigation.navigate("UserSettings")}>
-				<Icon style={{color: 'white', fontSize: 35}} name="account-circle"  type="MaterialIcons"/>
-			</TouchableOpacity>
+				<FullScreenVideo 
+				streamURL={activeStreamResult.length > 0 ? activeStreamResult[0].url : null}
+				rejoin={this.handleRejoin.bind(this)}>
+				</FullScreenVideo>
+				{
+				this.state.joinState == "joined"?
+					<Thumbnails streams={this.state.streams}
+					setActive={this.handleSetActive.bind(this)}
+					activeStreamId={this.state.activeStreamId}
+					/>
+					: null
+				}
+				
+				<TouchableOpacity style={styles.profileIcon} onPress={() => this.props.navigation.navigate("UserSettings")}>
+					<Icon style={{color: 'white', fontSize: 35}} name="account-circle"  type="MaterialIcons"/>
+				</TouchableOpacity>
 
-			<TouchableOpacity style={styles.friendsIcon} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
-				<Icon style={{color: 'white', fontSize: 35}} name="chat"  type="Entypo"/>
-			</TouchableOpacity>
+				<TouchableOpacity style={styles.friendsIcon} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
+					<Icon style={{color: 'white', fontSize: 35}} name="chat"  type="Entypo"/>
+				</TouchableOpacity>
 
-			{this.renderJoinContainer()}
-			
-			{
-              this.state.joinState == "joined" && this.state.streams.length > 1 && !this.state.hideInfo ?
-                <View style={[styles.backgroundOverlay, { display: 'flex', justifyContent: 'center', alignItems: 'center' }]}>
-					<Image source={doubleTapImage} style={{width: 120, height: 120}} />
-					<Text style={[styles.joinLabel, {maxWidth: 220, textAlign: 'center'}]}>You can double tap to connect randomly to another person!</Text>
-					<Button style={{alignSelf: 'center', marginTop: 15}} small onPress={() => this.setState({ hideInfo: true })}>
-						<Text>Continue</Text>
-					</Button>
-				</View>
-				: null
-			}
-			{this.renderFriendStates()}
+				{this.renderJoinContainer()}
+				
+				{
+				this.state.joinState == "joined" && this.state.streams.length > 1 && !this.state.hideInfo && !this.state.gestureNotification ?
+					<View style={[styles.backgroundOverlay, { display: 'flex', justifyContent: 'center', alignItems: 'center' }]}>
+						<Icon name="gesture-swipe-right" type="MaterialCommunityIcons"  color="white" fontSize={22}  />
+						<Text style={[styles.joinLabel, {maxWidth: 220, textAlign: 'center'}]}>You can swipe right to connect randomly to another person!</Text>
+						<Button style={{alignSelf: 'center', marginTop: 15}} small onPress={() => this.setState({ hideInfo: true })}>
+							<Text>Continue</Text>
+						</Button>
+					</View>
+					: 
+					null
+				}
+				{this.renderGestureNotification()}
+				{this.renderFriendStates()}
+
         </View>
+		</GestureRecognizer>
       );
     }
 
 	renderLogo() {
 		return <Image source={logo} style={styles.logo} resizeMode={"contain"} />;
+	}
+	renderGestureNotification() {
+		if (this.state.gestureNotification == false && this.state.hideInfo == true) {
+			return (
+				<View style={[styles.backgroundOverlay, { display: 'flex', justifyContent: 'center', alignItems: 'center' }]}>
+						<View style={[styles.backgroundOverlay, { display: 'flex', justifyContent: 'center', alignItems: 'center' }]}>
+							<Icon name="gesture-swipe-right" type="MaterialCommunityIcons" color="white" fontSize={22} />
+							<Text style={[styles.joinLabel, {maxWidth: 220, textAlign: 'center'}]}>You can swipe right to connect randomly to another person!</Text>
+							<Button style={{alignSelf: 'center', marginTop: 15}} small onPress={() => this.setState({ gestureNotification: true })}>
+								<Text>Continue</Text>
+							</Button>
+						</View>
+				</View>
+			)
+		}
+		return null;
 	}
 
 	renderJoinContainer() {
@@ -198,51 +244,52 @@ export default class MainAppScreen extends Component {
 		return null;
 	}
 	renderFriendStates(){
-		if (this.state.joinState=="joined"){
-			return(
-			this.state.alreadyFriends ?
-			<View style={[styles.friendsContainer]}>
-				<TouchableOpacity style={styles.alreadyFriendsButton} activeOpacity={0}
-					onPress={()=>{/* alert("you are already friends"); */this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId)}}>
-						<Icon style={{color: 'white', fontSize: 50}} name="check-circle" type="Feather" />
-				</TouchableOpacity>
-			</View>
-			:
-			this.handleSendFriendRequest()
-				)
-			}
-	}
-	handleSendFriendRequest(){
-		if(this.state.alreadyFriends==false){
-			if(this.state.friendRequsted){
+		if ( this.state.joinState == "joined" && this.state.hideInfo == true && this.state.gestureNotification == true ){
+			if (this.state.gestureNotification == true){
+			if (this.state.alreadyFriends == true){
 				return(
 					<View style={[styles.friendsContainer]}>
-						<TouchableOpacity style={styles.waitingFriendButton} activeOpacity={0}
-							onPress={()=>{alert("pending");}}>
-								<Icon style={{color: 'white', fontSize: 50}} name="send" type="FontAwesome" />
+						<TouchableOpacity style={styles.alreadyFriendsButton} activeOpacity={0}
+							onPress={()=>{alert("you are already friends");}}>
+								<Icon style={{color: 'white', fontSize: 50}} name="check-circle" type="Feather" />
 						</TouchableOpacity>
 					</View>
 				)
-			}else if(this.state.friendRequsted == false){
-				return(
-					<View style={[styles.friendsContainer]}>
-						<TouchableOpacity style={styles.addFriendButton} activeOpacity={0}
-							onPress={()=>{alert("added");this.setState({friendRequsted:true})}}>
-								<Icon style={{color: 'white', fontSize: 50}} name="person-add" type="MaterialIcons" />
-						</TouchableOpacity>
-					</View>
-				)
-			}else if (this.state.friendRequstedFromOtherUser){
-					<View style={[styles.friendsContainer]}>
-						<TouchableOpacity style={styles.friendRequstedFromOtherUser} activeOpacity={0}
-							onPress={()=>{alert("you accepted friend Request");this.setState({alreadyFriends:true})}}>
-								<Icon style={{color: 'white', fontSize: 50}} name="call-received" type="MaterialIcons" />
-						</TouchableOpacity>
-					</View>
 			}
-		
+			else if(this.state.alreadyFriends == false && this.state.hideInfo == true ){
+				if(this.state.friendRequest==true && this.state.alreadyFriends == false){
+					return(
+						<View style={[styles.friendsContainer]}>
+							<TouchableOpacity style={styles.waitingFriendButton} activeOpacity={0}
+								onPress={()=>{alert("pending");}}>
+									<Icon style={{color: 'white', fontSize: 30}} name="send" type="FontAwesome" />
+							</TouchableOpacity>
+						</View>
+					)
+				}else if(this.state.friendRequested == false ){
+					return(
+						<View style={[styles.friendsContainer]}>
+							<TouchableOpacity style={styles.addFriendButton} activeOpacity={0}
+								onPress={()=>{alert("added");this.setState({friendRequest:true});this.handleSendFriendRequest(this.state.friendId,globals.user.id)}}>
+									<Icon style={{color: 'white', fontSize: 30}} name="person-add" type="MaterialIcons" />
+							</TouchableOpacity>
+						</View>
+					)
+				}else if (this.state.friendRequested == true && this.state.friendRequest == false){
+					return(
+						<View style={[styles.friendsContainer]}>
+							<TouchableOpacity style={styles.friendRequstedFromOtherUser} activeOpacity={0}
+								onPress={()=>{alert("you accepted friend Request"); this.handleAcceptFriendRequest(this.state.friendRequstedFromId); console.log(this.state.friendRequstedFromId)}}>
+									<Icon style={{color: 'white', fontSize: 30}} name="call-received" type="MaterialIcons" />
+							</TouchableOpacity>
+						</View>
+							)
+					}
+			
+				}
+			return null;
+			}
 		}
-	
 	}
 
 	handleSetActive(streamId) {
@@ -253,8 +300,7 @@ export default class MainAppScreen extends Component {
 	}
 
 	handleRejoin() {
-		webRTCServices._disconnect()
-		this.getLocalStream()
+		this.exitCall()
 		this.setState({
 			joinState: "joining",
 			streams: this.state.streams.filter(stream => stream.id == SELF_STREAM_ID)
@@ -275,12 +321,16 @@ export default class MainAppScreen extends Component {
 			joined: this.handleJoined.bind(this),
 			friendConnected: this.handleFriendConnected.bind(this),
 			dataChannelMessage: this.handleDataChannelMessage.bind(this),
-			onFriendRequsted:this.onFriendRequsted.bind(this),
 		}
 
 		api.get_room(this.state.accessToken).then((response) => {
 			console.log(response)
-			this.setState({friendId:response.friend_id})
+			this.setState({
+				friendId:response.friend_id,
+				alreadyFriends:response.user_is_friend,
+				friendRequest:response.user_is_friend_request,
+				friendRequested:response.user_is_friend_requested,})
+				console.log(this.state)
 			webRTCServices.join(response.room_token, this.state.name, callbacks);
 		})
 	}
@@ -298,7 +348,13 @@ export default class MainAppScreen extends Component {
 		webRTCServices.exitCallFromOtherUser(accessToken,friend_id);
 		webRTCServices.exitCall(socketId);
 		this.setState({
-			joinState: "ready", 
+			joinState: "ready",
+			alreadyFriends:null,
+			friendRequest:null,
+			friendRequested:null,
+			socketId:null,
+			friendId:null,
+			friendRequstedFromId:null, 
 		});
 		this.getLocalStream();
 	}
@@ -306,7 +362,13 @@ export default class MainAppScreen extends Component {
 
 	handleFriendLeft() {
 		this.setState({
-			joinState: "ready", 
+			joinState: "ready",
+			alreadyFriends:null,
+			friendRequest:null,
+			friendRequested:null,
+			socketId:null,
+			friendId:null,
+			friendRequstedFromId:null, 
 		});
 		this.getLocalStream();
 	} 
@@ -328,16 +390,45 @@ export default class MainAppScreen extends Component {
 	}
 
 	
-	addingFriend(){
-		this.globals.mainSocket.emit("custom_message", { type: 'friend_request', data: { friend_id: 0 } })
-	}
-	onFriendRequsted(data){
-		this.setState({friendRequsted:true});
-		console.log(data)
-	}
-
-
 
 	handleDataChannelMessage(message) {}
-}
 
+	handleSendFriendRequest(to,from){
+		console.log("tooooo",to);
+		globals.mainSocket.emit("custom_message", { type: 'recieveAddFriend', data: { your_id:to,from:from}});
+		console.log(to,this.state.accessToken)	
+		api.add_friend(to,this.state.accessToken).then((response) => {
+				console.log(response)
+			});
+	}
+
+	handleFriendRequested(data){
+		this.setState({friendRequested:true,friendRequstedFromId:data.from})
+	}
+
+	handleAcceptFriendRequest(to){
+		if (this.state.friendId==to){
+		api.accept_friend_request(to,this.state.accessToken).then((response) => {
+			console.log(response)
+			console.log("helloitsme")
+			this.setState({alreadyFriends:true});
+		});
+		globals.mainSocket.emit("custom_message", { type: 'acceptedFriendRequest'});
+	}
+		else if(this.state.friendRequstedFromId==null && this.state.friendId!=null){
+			api.accept_friend_request(this.state.friendId,this.state.accessToken).then((response) => {
+				console.log(response)
+			});
+			globals.mainSocket.emit("custom_message", { type: 'acceptedFriendRequest'});
+		}
+	}
+	acceptedFriendRequest(){
+		this.setState({alreadyFriends:true});
+	}
+
+}
+	
+
+
+//// this is exit call function 
+//this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId)

@@ -78,6 +78,9 @@ const api =  {
     reject_friend_request: async (to, accessToken) => {
         return await apiFetch(config.urls.reject_friend_request, methods.post, JSON.stringify({ friend_id: to }), accessToken);
     },
+    add_friend: async (to, accessToken) => {
+        return await apiFetch(config.urls.add_friend, methods.post,JSON.stringify({ to: to }), accessToken);
+    },
 }
 
 module.exports = api;

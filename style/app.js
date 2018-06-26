@@ -40,7 +40,7 @@ export default StyleSheet.create({
     left: 0,
     width: config.screenWidth,
     height: config.screenHeight,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -101,26 +101,23 @@ export default StyleSheet.create({
   },
   friendsContainer:{
     position: "absolute",
-    top: 30,
-    left: 0,
-    right:10,
-    width: config.screenWidth,
-    height: config.screenHeight,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    width: 45,
+    height: 45,
+    top: 580,
+    left: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1,
-    paddingTop: 15,
     //borderWidth: 1, borderColor: "white"
   },
   alreadyFriendsButton:{
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 40,
-    height: 40,
-    marginTop: 70,
+    width: "90%",
+    height: "90%",
     borderRadius: 100,
     backgroundColor: "green"
   },
@@ -128,9 +125,8 @@ export default StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 40,
-    height: 40,
-    marginTop: 70,
+    width: "90%",
+    height: "90%",
     borderRadius: 100,
     backgroundColor: "orange"
   },
@@ -138,21 +134,19 @@ export default StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 40,
-    height: 40,
-    marginTop: 70,
+    width: "90%",
+    height: "90%",
     borderRadius: 100,
-    backgroundColor: "blue"
+    backgroundColor: "#6ae4e0"
   },
   friendRequstedFromOtherUser:{
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 40,
-    height: 40,
-    marginTop: 70,
+    width: "90%",
+    height: "90%",
     borderRadius: 100,
-    backgroundColor: "red"
+    backgroundColor: "yellow"
   }
 
 });

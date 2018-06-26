@@ -4,6 +4,8 @@ import {RTCView} from 'react-native-webrtc';
 import config from "../config/app.js";
 import styles from "../../style/fullScreenVideo.js";
 
+
+
 export default class FullScreenVideo extends Component{
 
   constructor(props) {
@@ -11,17 +13,17 @@ export default class FullScreenVideo extends Component{
     this.state = {
     };
   }
-
+ 
   render() {
-    return <View style={styles.container}>
-      <TouchableWithoutFeedback style={styles.video} onLongPress={() => {this.props.rejoin()}}>
+    return (
+    <View style={styles.container}>
       {
         config.useRCTView ?
         <RTCView streamURL={this.props.streamURL} zOrder={0} style={[styles.video]} mirror={true} />
         :
         <Image source={this.props.streamURL} style={styles.video} resizeMode={"contain"} />
       }
-      </TouchableWithoutFeedback>
     </View>
+    )
   }
 }

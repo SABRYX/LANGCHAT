@@ -158,21 +158,6 @@ socket.on("join", function (friend) {
 	console.log("New friend joint conversation: ", friend);
 });
 
-socket.on('custom_message', function (data) {
-	console.log("recived a custom message")
-	if(data.type == 'friend_request') {
-		if(data.friend_id == myId){
-			if (onFriendRequsted != null) {
-				onFriendRequsted(JSON.parse(data));
-			}
-		}
-	 }else if (data.type == 'exitCall'){
-			if (globals.user.id===data.your_id){
-				EventRegister.emitEvent('friendLeft')
-			}
-	 }
-});
-
 function logError(error) {
 	console.log("logError", error);
 }
@@ -244,7 +229,8 @@ function join(roomId, name, callbacks) {
 	socket.emit('join', { roomId, name }, function (result) {
 		friends = result;
 		console.log('Joins', friends);
-		friends.forEach((friend) => {
+		if (friends != []) {
+			friends.forEach((friend) => {
 			createPeerConnection(friend, true);
 		});
 		if (callbacks.joined != null) {
@@ -255,8 +241,12 @@ function join(roomId, name, callbacks) {
 			callbacks.joined();
 			InCallManager.start({media: 'audio'});
 			InCallManager.setForceSpeakerphoneOn(true);
+		}}
+		else if(friends==[]){
+			this.join(roomId, name, callbacks);
 		}
 	});
+	// console.log("cortana")
 }
 
 function exitCallFromOtherUser(accessToken,friend_id,callbacks){
