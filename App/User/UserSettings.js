@@ -10,7 +10,7 @@ import Email from '../LogSignScreen/InputComponents/Email';
 import Password from '../LogSignScreen/InputComponents/Password';
 import MultiSelect from '../LogSignScreen/InputComponents/MultiSelect';
 import PhotoUpload from 'react-native-photo-upload'
-
+import NewPassword from "../LogSignScreen/InputComponents/NewPassword"
 export default class UserSettings extends Component {
     accessToken;
 
@@ -29,15 +29,16 @@ export default class UserSettings extends Component {
     async componentDidMount() {
         api.getLanguages().then((languages) => {
             this.setState({ languages })
-            this.state.inputs[2].loadItems(this.state.languages)
+            this.state.inputs[3].loadItems(this.state.languages)
         })
 
         await storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
             api.me(result).then((response) => {
+                console.log(response)
                 this.setState({dataLoaded: "done"})
                 this.state.inputs[0].changeText(response.name)
-                this.state.inputs[2].setSelectedItems(response.languages)
+                this.state.inputs[3].setSelectedItems(response.languages)
                 this.setState({
                     userAvatar: {
                         uri: response.avatar
@@ -62,17 +63,22 @@ export default class UserSettings extends Component {
 
     updateProfile = () => {
         this.setState({dataLoaded: 'Updating'})
-        api.updateProfile(this.state.inputs[0].state.value,
+        console.log(this.state)
+       if(this.state.inputs[1].value != "" && this.state.inputs[2].value != ""){
+            api.updateProfile(this.state.inputs[0].state.value,
                           this.state.inputs[1].state.value,
-                          this.state.profileAvatar,
                           this.state.inputs[2].state.value,
+                          this.state.profileAvatar,
+                          this.state.inputs[3].state.value,
                           accessToken).then((response) => {
                               alert(JSON.stringify(response))
-                            this.setState({dataLoaded: 'done'})
+                              console.log(response)
                             
+                            this.setState({dataLoaded: 'done'})
+                        
 
                             this.state.inputs[0].changeText(response.data.name)
-                            this.state.inputs[2].setSelectedItems(response.data.languages)
+                            this.state.inputs[3].setSelectedItems(response.data.languages)
                             this.setState({
                                 userAvatar: {
                                     uri: response.data.avatar
@@ -81,13 +87,13 @@ export default class UserSettings extends Component {
                           })
                           .catch(() => {
                             
-                          })
+                          })}
     }
 
     render() {
         return (
             <Container style={{ backgroundColor: 'white' }}>
-                <Header style={{marginTop: 15}} noShadow>
+                <Header style={{marginTop: 10}} noShadow>
                     <Left>
                         <Button transparent onPress={() =>this.props.navigation.goBack(null)}>
                             <Icon name='arrow-back' />
@@ -102,7 +108,7 @@ export default class UserSettings extends Component {
                         {
                             this.state.dataLoaded == "done" ?
                                 <View>
-                                    <View style={{ backgroundColor: "#3f51b5", height: 200, width: config.screenWidth, marginTop: -15, marginBottom: 10 }}>
+                                    <View style={{ backgroundColor: "#3f51b5", height: 160, width: config.screenWidth, marginTop: -15, marginBottom: 10 }}>
                                         <PhotoUpload
                                             onPhotoSelect={
                                                 avatar => {
@@ -136,13 +142,19 @@ export default class UserSettings extends Component {
                                             update={() => {}}
                                             ref={(ref) => { this.state.inputs[1] = ref; }}
                                         />
+                                         <NewPassword
+                                            full
+                                            changeFocus={this.changeInputFocus(1)}
+                                            update={() => {}}
+                                            ref={(ref) => { this.state.inputs[2] = ref; }}
+                                        />
                                         <Text style={{ color: '#666', fontSize: 12, marginVertical: 10, marginHorizontal: 15 }}>Leave the password field empty for not changing it!</Text>
                                         <MultiSelect
                                             full
                                             items={this.state.languages}
                                             update={() => {}}
                                             special
-                                            ref={(ref) => { this.state.inputs[2] = ref; }}
+                                            ref={(ref) => { this.state.inputs[3] = ref; }}
                                         />
                                     </Form>
                                     <View style={{marginTop: 2, alignSelf: 'center',}}>

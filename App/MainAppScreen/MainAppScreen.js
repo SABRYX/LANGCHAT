@@ -130,10 +130,19 @@ export default class MainAppScreen extends Component {
 	}
 
 	onSwipeDown(gestureState) {
-			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);		  
+		if (this.state.joinState=="joined"&&this.state.hideInfo==true&&this.state.gestureNotification==true){
+			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);
+		}else if (this.state.hideInfo==false && this.state.joinState=="joined"){
+			this.setState({hideInfo:true})
+		}
+					  
 	  }
 	  onSwipeRight(gestureState){
-		this.handleRejoin()
+		if (this.state.joinState=="joined"&&this.state.gestureNotification==true){
+			this.handleRejoin()
+		}else if (this.state.gestureNotification==false && this.state.joinState=="joined"){
+			this.setState({gestureNotification:true})
+		}
 	  }
 	
 	
@@ -183,11 +192,9 @@ export default class MainAppScreen extends Component {
 				{
 				this.state.joinState == "joined" && this.state.streams.length > 1 && !this.state.hideInfo && !this.state.gestureNotification ?
 					<View style={[styles.backgroundOverlay, { display: 'flex', justifyContent: 'center', alignItems: 'center' }]}>
-						<Icon name="gesture-swipe-right" type="MaterialCommunityIcons"  color="white" fontSize={22}  />
-						<Text style={[styles.joinLabel, {maxWidth: 220, textAlign: 'center'}]}>You can swipe right to connect randomly to another person!</Text>
-						<Button style={{alignSelf: 'center', marginTop: 15}} small onPress={() => this.setState({ hideInfo: true })}>
-							<Text>Continue</Text>
-						</Button>
+						<Icon name="gesture-swipe-down" type="MaterialCommunityIcons"  color="white" fontSize={50} style={{color:"white"}}  />
+						<Text style={[styles.joinLabel, {maxWidth: 220, textAlign: 'center'}]}>You can swipe down to close the call !</Text>
+						<Text style={[styles.joinLabel2, {maxWidth: 220, textAlign: 'center'}]}>Now Swipe Down To Continue !</Text>
 					</View>
 					: 
 					null
@@ -208,11 +215,9 @@ export default class MainAppScreen extends Component {
 			return (
 				<View style={[styles.backgroundOverlay, { display: 'flex', justifyContent: 'center', alignItems: 'center' }]}>
 						<View style={[styles.backgroundOverlay, { display: 'flex', justifyContent: 'center', alignItems: 'center' }]}>
-							<Icon name="gesture-swipe-right" type="MaterialCommunityIcons" color="white" fontSize={22} />
+							<Icon name="gesture-swipe-right" type="MaterialCommunityIcons" color="white" fontSize={50} style={{color:"white"}} />
 							<Text style={[styles.joinLabel, {maxWidth: 220, textAlign: 'center'}]}>You can swipe right to connect randomly to another person!</Text>
-							<Button style={{alignSelf: 'center', marginTop: 15}} small onPress={() => this.setState({ gestureNotification: true })}>
-								<Text>Continue</Text>
-							</Button>
+							<Text style={[styles.joinLabel2, {maxWidth: 220, textAlign: 'center'}]}>Now Swipe right To Continue !</Text>
 						</View>
 				</View>
 			)
@@ -251,7 +256,7 @@ export default class MainAppScreen extends Component {
 					<View style={[styles.friendsContainer]}>
 						<TouchableOpacity style={styles.alreadyFriendsButton} activeOpacity={0}
 							onPress={()=>{alert("you are already friends");}}>
-								<Icon style={{color: 'white', fontSize: 50}} name="check-circle" type="Feather" />
+								<Icon style={{color: 'white', fontSize: 30}} name="check-circle" type="Feather" />
 						</TouchableOpacity>
 					</View>
 				)
@@ -300,7 +305,7 @@ export default class MainAppScreen extends Component {
 	}
 
 	handleRejoin() {
-		this.exitCall()
+		setTimeout(()=>{this.exitCall(),200}) 
 		this.setState({
 			joinState: "joining",
 			streams: this.state.streams.filter(stream => stream.id == SELF_STREAM_ID)

@@ -50,7 +50,13 @@ export default StyleSheet.create({
   },
 
   joinLabel: {
-    color: "rgba(255,255,255,0.5)",
+    color: "#6ae4e0",
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: 10
+  },
+  joinLabel2: {
+    color: "white",
     fontSize: 12,
     fontWeight: "bold",
     marginTop: 10

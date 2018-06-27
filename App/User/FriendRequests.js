@@ -44,9 +44,11 @@ export default class FriendRequest extends Component {
             this.accessToken = result
             
             api.get_all_requests(result).then((response) => {
+                console.log("hi im response",response)
                 console.log(response)
-                response.forEach(element => {
+                response.data.forEach((element) => {
                     this.state.friends.push(element)
+                    console.log(element)
                 });
                 this.setState({ screen: 1, dataLoaded: "done" })
                 console.log(this.state.friends);
@@ -56,10 +58,15 @@ export default class FriendRequest extends Component {
 
     removeRequestFromUI(requestNumber) {
         var index = requestNumber;
-        this.state.friends.splice(index,1);
+        console.log(index)
+        console.log(this.state.friends)
+        // var anotherNum = this.state.friends.indexOf(this.state.friends.data.requestNumber)
+
+        // console.log(anotherNum)
+        // this.state.friends.splice(index,1);
         // delete this.state.friends[index]
-        // console.log(requestNumber);
-        this.setState({ friends: this.state.friends })
+        // // console.log(requestNumber);
+        // this.setState({ friends: this.state.friends })
 
 
     }
@@ -95,7 +102,7 @@ export default class FriendRequest extends Component {
                                 return new Date(b.last_message_date) - new Date(a.last_message_date);
                             })}
                                 renderRow={(friend, s1, index) =>
-                                    <ListItem style={{ backgroundColor: friend.is_seen ? 'transparent' : 'transparent', marginTop: "2%", flexDirection: "row", flex: 1 }}>
+                                    <ListItem style={{ backgroundColor: 'transparent', marginTop: "2%", flexDirection: "row", flex: 1 }}>
                                         <Left style={{ margin: "0%", flex: 1 }}>
                                             {/* <Thumbnail source={{uri: friend.avatar}} /> */}
                                             <ImageLoad
@@ -103,22 +110,21 @@ export default class FriendRequest extends Component {
                                                 loadingStyle={{ width: 50, height: 50 }}
                                                 placeholderStyle={{ width: 50, height: 50, resizeMode: Image.resizeMode.stretch, borderRadius: 50 }}
                                                 borderRadius={50}
-                                                source={{ uri: friend.user.avatar }}
-                                                placeholderSource={require('../../assets/default_avatar.png')} />
+                                                source={{ uri: friend.friend.avatar }} />
 
                                         </Left>
                                         <Body style={{ marginLeft: "0%", width: 180, flex: 3 }}>
-                                            <Text style={{ fontWeight: 'normal', textAlign: "left" }}>{friend.user.name}</Text>
+                                            <Text style={{ fontWeight: 'normal', textAlign: "left" }}>{friend.friend.name}</Text>
                                         </Body>
                                         <Right style={{ flexDirection: "row", flex: 2, justifyContent: "space-between" }}>
                                             <TouchableOpacity style={{ width: 50, height: 40, margin: "0%", justifyContent: "center" }}
-                                                onPress={() => { this.accept_friend_request(this.state.friends[index].to); this.removeRequestFromUI(index); }}
+                                                 onPress={() => { this.accept_friend_request(this.state.friends[index].friend.id);var user =this.state.friends[index].friend.id ;this.removeRequestFromUI(user);console.log(user) }}
                                             >
                                                 <Icon name='check' type="FontAwesome" style={{ color: "green", alignSelf: "center" }} />
                                             </TouchableOpacity>
 
                                             <TouchableOpacity style={{ width: 50, height: 40, margin: "0%", justifyContent: "center" }}
-                                                onPress={() => { this.reject_friend_request(this.state.friends[index].to); this.removeRequestFromUI(index); }}
+                                                onPress={() => { this.reject_friend_request(this.state.friends[index].friend.to); this.removeRequestFromUI(index); }}
                                             >
                                                 <Icon name='remove' type="FontAwesome" style={{ color: "red", alignSelf: "center" }} />
                                             </TouchableOpacity>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, Image, ScrollView, BackHandler } from 'react-native';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
-    Title, Text, Spinner, List, ListItem,
+    Title, Text, Spinner, List, ListItem,Badge
 } from 'native-base';
 import ImageLoad from 'react-native-image-placeholder';
 import config from "../../src/config/app.js";
@@ -26,12 +26,13 @@ export default class UserFriends extends Component {
             userChatRef: null,
             last_message:null,
             messageWritten:null,
-            BadgeCount:1,
+            BadgeCount:0,
             useBackButton:true,
         }
     }
     componentWillMount(){
-        this.getMessagesMain(); 
+        this.getMessagesMain();
+        this.getFriendRequestCount(); 
     }
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress');
@@ -56,7 +57,7 @@ export default class UserFriends extends Component {
                    this.state.friends.push(element.friend)
                 });
 
-                console.log(this.state.friends)
+                console.log(this.state.friends,"{{}}}")
                 this.setState({ screen: 1, dataLoaded: "done" })
             })
         }
@@ -101,6 +102,15 @@ export default class UserFriends extends Component {
                 console.log(this.state.messageWritten);
             }
     }
+     getFriendRequestCount(){
+        storage.getItem(storage.keys.accessToken).then((result) => {
+            accessToken = result
+        
+            api.get_friend_requests_count(result).then((response) => {
+                this.setState({BadgeCount:response})
+            })
+        })
+    }
 
     renderBody() {
         if (this.state.screen == 1) {
@@ -108,7 +118,7 @@ export default class UserFriends extends Component {
                 
                 <Content style={{ width: config.screenWidth,height:config.screenHeight,flex:1 }}>
                     {
-                        this.state.dataLoaded == "done" ? 
+                        this.state.dataLoaded == "done" && this.state.friends != false ? 
                         <List style={{marginTop: 0}} dataArray={this.state.friends.sort((a,b) => {
                             return new Date(b.last_message_date) - new Date(a.last_message_date);
                         })}
@@ -142,7 +152,7 @@ export default class UserFriends extends Component {
                                         }>
                                 </List>
                         :
-                        null
+                      null
                     }
 
                     {
@@ -164,11 +174,17 @@ export default class UserFriends extends Component {
          this.getMessagesMain();
          console.log("here is backtochat")
     }
+    badgeGenerator(){
+        if(this.state.BadgeCount>0){
+        return(<Badge style={{scaleX: 0.7, scaleY: 0.7,position:"absolute",}}>
+            <Text>{this.state.BadgeCount}</Text>
+        </Badge>)}else{return null}
+    }
 
 
     render() {
         return (<Container style={{ backgroundColor: 'white', flex: 1 }}>
-        <Header style={{ marginTop: 20 }} noShadow>
+        <Header style={{ marginTop:20 }} noShadow>
             <Left>
                 <Button transparent onPress={() =>this.props.navigation.goBack()}>
                     <Icon name='arrow-back' />
@@ -177,7 +193,7 @@ export default class UserFriends extends Component {
             <Body>
                 <Title></Title>
             </Body>
-            <Right>
+            <Right> 
                 <Button transparent onPress={() =>{
                         this.props.navigation.navigate('FriendRequest', { onNavigateBack: this.backToChat});
                         this.setState({ 
@@ -191,8 +207,10 @@ export default class UserFriends extends Component {
                             BadgeCount:1,
                             useBackButton:true,
                             })}}>
-                        <Icon name='user-follow' type="SimpleLineIcons" />
+                        <Icon name='user-follow' type="SimpleLineIcons" style={{marginRight:"8%"}} />
+                        
                 </Button>
+                {this.badgeGenerator()}
             </Right>
         </Header>
             <Content style={{ backgroundColor: 'white', flex: 1 }}>

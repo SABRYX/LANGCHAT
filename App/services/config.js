@@ -20,6 +20,7 @@ const config = {
         accept_friend_request:`${API}/friend/accept_friend_request`,
         reject_friend_request:`${API}/friend/reject_friend_request`,
         add_friend:`${API}/friend/add_friend`,
+        get_friend_requests_count:`${API}/friend/get_friend_requests_count`,
     }
 }
 

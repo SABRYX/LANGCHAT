@@ -39,11 +39,12 @@ const api =  {
     getLanguages: async () => {
         return await apiFetch(config.urls.get_languages, methods.get, null);
     },
-    updateProfile: async (name, password, avatar, languages, accessToken) => {
+    updateProfile: async (name, old_password,new_password, avatar, languages, accessToken) => {
         const body = JSON.stringify({
             name,
             ...(avatar != "" ? { avatar } : null),
-            ...(password != "" ? { password } : null),
+            ...(old_password != "" ? { old_password } : null),
+            ...(new_password != "" ? { new_password } : null),
             languages
         })
         return await apiFetch(config.urls.update_profile, methods.post, body, accessToken);
@@ -80,6 +81,9 @@ const api =  {
     },
     add_friend: async (to, accessToken) => {
         return await apiFetch(config.urls.add_friend, methods.post,JSON.stringify({ to: to }), accessToken);
+    },
+    get_friend_requests_count: async (accessToken) => {
+        return await apiFetch(config.urls.get_friend_requests_count, methods.get, null, accessToken);
     },
 }
 
