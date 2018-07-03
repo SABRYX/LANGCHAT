@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, ScrollView } from 'react-native';
+import { View, Image, ScrollView,BackHandler} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title, Text, Form, Spinner } from 'native-base';
 import config from "../../src/config/app.js";
 import styles from "../../style/app.js";
@@ -11,6 +11,7 @@ import Password from '../LogSignScreen/InputComponents/Password';
 import MultiSelect from '../LogSignScreen/InputComponents/MultiSelect';
 import PhotoUpload from 'react-native-photo-upload'
 import NewPassword from "../LogSignScreen/InputComponents/NewPassword"
+import { NavigationActions } from 'react-navigation' ;
 export default class UserSettings extends Component {
     accessToken;
 
@@ -22,20 +23,17 @@ export default class UserSettings extends Component {
             languages: [],
             userAvatar: 'https://thesocietypages.org/socimages/files/2009/05/nopic_192.gif',
             profileAvatar: '',
-            dataLoaded: "Loading"
+            dataLoaded: "Loading",
+            oldResponse:null
         }
     }
     
     async componentDidMount() {
-        api.getLanguages().then((languages) => {
-            this.setState({ languages })
-            this.state.inputs[3].loadItems(this.state.languages)
-        })
-
+        BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
         await storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
             api.me(result).then((response) => {
-                console.log(response)
+                this.setState({oldResponse:response})
                 this.setState({dataLoaded: "done"})
                 this.state.inputs[0].changeText(response.name)
                 this.state.inputs[3].setSelectedItems(response.languages)
@@ -46,8 +44,25 @@ export default class UserSettings extends Component {
                 })
             })
         })
-    }
+        api.getLanguages().then((languages) => {
+            this.setState({ languages })
+            this.state.inputs[3].loadItems(this.state.languages)
+        })
 
+    }
+    componentWillUnmount(){
+        BackHandler.removeEventListener('hardwareBackPress', ()=> {return this.handleBackButton()});
+    }
+    handleBackButton() { 
+        this.props.navigation.dispatch(NavigationActions.reset(
+            {
+               index: 0,
+               actions: [
+                 NavigationActions.navigate({ routeName: 'MainAppScreen'})
+               ]
+             }))
+              return true;
+  }
     logOut = async () => {
         api.logout(accessToken).then(() => {
             storage.removeItem(storage.keys.accessToken);
@@ -63,20 +78,20 @@ export default class UserSettings extends Component {
 
     updateProfile = () => {
         this.setState({dataLoaded: 'Updating'})
-        console.log(this.state)
-       if(this.state.inputs[1].value != "" && this.state.inputs[2].value != ""){
+       if(this.state.inputs[1].value != "" && this.state.inputs[2].value != "" && this.state.inputs[3]!=""){
             api.updateProfile(this.state.inputs[0].state.value,
                           this.state.inputs[1].state.value,
                           this.state.inputs[2].state.value,
                           this.state.profileAvatar,
                           this.state.inputs[3].state.value,
                           accessToken).then((response) => {
-                              alert(JSON.stringify(response))
-                              console.log(response)
-                            
+                            console.log(response)
+                            if (response.error == "These credentials do not match our records."){
+                                alert(response.error);
+                                this.returnOldProfile(this.state.oldResponse)
+                                console.log(this.state.oldResponse)
+                        }else {
                             this.setState({dataLoaded: 'done'})
-                        
-
                             this.state.inputs[0].changeText(response.data.name)
                             this.state.inputs[3].setSelectedItems(response.data.languages)
                             this.setState({
@@ -84,16 +99,25 @@ export default class UserSettings extends Component {
                                     uri: response.data.avatar
                                 }
                             })
+                            }
                           })
-                          .catch(() => {
-                            
-                          })}
+                          }
+    }
+    returnOldProfile(oldResp){
+                this.setState({dataLoaded: "done"})
+                this.state.inputs[0].changeText(oldResp.name)
+                this.state.inputs[3].setSelectedItems(oldResp.languages)
+                this.setState({
+                    userAvatar: {
+                        uri: oldResp.avatar
+                    }
+                })
     }
 
     render() {
         return (
             <Container style={{ backgroundColor: 'white' }}>
-                <Header style={{marginTop: 10}} noShadow>
+                <Header style={{marginTop: "6%",backgroundColor:"deepskyblue"}} noShadow>
                     <Left>
                         <Button transparent onPress={() =>this.props.navigation.goBack(null)}>
                             <Icon name='arrow-back' />
@@ -108,7 +132,7 @@ export default class UserSettings extends Component {
                         {
                             this.state.dataLoaded == "done" ?
                                 <View>
-                                    <View style={{ backgroundColor: "#3f51b5", height: 160, width: config.screenWidth, marginTop: -15, marginBottom: 10 }}>
+                                    <View style={{ backgroundColor: "deepskyblue", height: 160, width: config.screenWidth, marginTop: -15, marginBottom: 10 }}>
                                         <PhotoUpload
                                             onPhotoSelect={
                                                 avatar => {
@@ -164,7 +188,7 @@ export default class UserSettings extends Component {
                                     </View>
 
                                     <View style={{padding: 10}}>
-                                        <Button iconLeft block onPress={this.updateProfile.bind(this)} style={{marginBottom: 10}}>
+                                        <Button iconLeft block onPress={this.updateProfile.bind(this)} style={{marginBottom: 10,backgroundColor:"deepskyblue"}}>
                                             <Icon name='md-checkmark' />
                                             <Text>Update profile</Text>
                                         </Button>

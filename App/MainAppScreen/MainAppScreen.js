@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, TouchableHighlight, View, ListView, Image, TextInput, DeviceEventEmitter,BackHandler,TouchableOpacity } from 'react-native';
 import { RTCView } from 'react-native-webrtc';
-import { Button, Text, Icon, Spinner } from 'native-base';
+import { Button, Text, Icon, Spinner,Fab, Container } from 'native-base';
 import Thumbnails from "../../src/components/Thumbnails.js";
 import FullScreenVideo from "../../src/components/FullScreenVideo.js";
 import Commons from "../../src/lib/commons.js";
@@ -54,6 +54,8 @@ export default class MainAppScreen extends Component {
 			socketId:null,
 			friendId:null,
 			friendRequstedFromId:null,
+			BadgeCount:0,
+			fabActive:false,
 		}
 	}
 
@@ -108,10 +110,21 @@ export default class MainAppScreen extends Component {
 		BackHandler.removeEventListener('hardwareBackPress', ()=> {return this.handleBackButton()});
 	}
 	  handleBackButton() {
-		  if (this.state.joinState === "joined" || this.state.joinState === "joining" ){
+		  if(this.state.joinState === "joined"){
 			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);
 			BackHandler.exitApp();
-		  }else{
+		  }
+		  else if (this.state.joinState === "joining" ){
+			this.setState({
+				joinState:"ready",
+				alreadyFriends:null,
+				friendRequest:null,
+				friendRequested:null,
+				socketId:null,
+				friendId:null,
+				friendRequstedFromId:null,})
+				
+		  }else if(this.state.joinState == "ready"){
 			BackHandler.exitApp();
 		  }
 		  
@@ -144,9 +157,20 @@ export default class MainAppScreen extends Component {
 			this.setState({gestureNotification:true})
 		}
 	  }
+	  getMessagesCount(){
+		  api.get_messages_count(this.state.accessToken).then((response)=>{
+			  this.setState({BadgeCount:response})
+		  }
+		  )
+	  }
+
+	  badgeGenerator(){
+        if(this.state.BadgeCount>0){
+        return(<Badge style={{scaleX: 0.7, scaleY: 0.7,position:"absolute",}}>
+            <Text>{this.state.BadgeCount}</Text>
+        </Badge>)}else{return null}
+    }
 	
-	
-  
     render() {
 		
 	  let activeStreamResult = this.state.streams.filter(stream => stream.id == this.state.activeStreamId);
@@ -161,11 +185,8 @@ export default class MainAppScreen extends Component {
 		}}
 		style={styles.container}
 		>
-        <View style={{
-          backgroundColor: '#000', flex: 1, alignItems: 'center', justifyContent: 'space-between',
-        }}
-        >	
-			
+			<Container style={{backgroundColor: '#000', flex: 1, alignItems: 'center', justifyContent: 'space-between',}}>	
+
 				<FullScreenVideo 
 				streamURL={activeStreamResult.length > 0 ? activeStreamResult[0].url : null}
 				rejoin={this.handleRejoin.bind(this)}>
@@ -178,14 +199,27 @@ export default class MainAppScreen extends Component {
 					/>
 					: null
 				}
+				{
+				this.state.joinState=="ready" ?
+				<Fab
+					active={this.state.fabActive}
+					direction="up"
+					containerStyle={{zIndex:2 }}
+					style={{ backgroundColor: 'deepskyblue' }}
+					position="bottomLeft"
+					onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
 				
-				<TouchableOpacity style={styles.profileIcon} onPress={() => this.props.navigation.navigate("UserSettings")}>
-					<Icon style={{color: 'white', fontSize: 35}} name="account-circle"  type="MaterialIcons"/>
-				</TouchableOpacity>
+					<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 35}} />
+						<Button style={{ backgroundColor: 'purple' }} onPress={() => this.props.navigation.navigate("UserSettings")}>
+							<Icon style={{color: 'white', fontSize: 30}} name="account-settings-variant"  type="MaterialCommunityIcons"/>
+						</Button>
+						<Button style={{ backgroundColor: 'indigo' }} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
+							<Icon style={{color: 'white', fontSize: 30}} name="chat"  type="Entypo"/>
+						</Button>
 
-				<TouchableOpacity style={styles.friendsIcon} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
-					<Icon style={{color: 'white', fontSize: 35}} name="chat"  type="Entypo"/>
-				</TouchableOpacity>
+				</Fab>
+				:null		
+			}
 
 				{this.renderJoinContainer()}
 				
@@ -202,7 +236,7 @@ export default class MainAppScreen extends Component {
 				{this.renderGestureNotification()}
 				{this.renderFriendStates()}
 
-        </View>
+        </Container>
 		</GestureRecognizer>
       );
     }
@@ -228,14 +262,14 @@ export default class MainAppScreen extends Component {
 	renderJoinContainer() {
 		if (this.state.streams.length <= 1) {
 			return <View style={[styles.joinContainer]}>
-				<Pulse color='#6ae4e0' numPulses={3} diameter={300} speed={20} duration={2000} />
+				{/* <Pulse color='#6ae4e0' numPulses={3} diameter={300} speed={20} duration={2000} /> */}
 				<TouchableHighlight style={styles.joinButton} activeOpacity={0}
 					onPress={this.handleJoinClick.bind(this)}>
 					{
 						this.state.joinState == "ready" ?
 						<Icon style={{color: 'white', fontSize: 50}} name="ios-happy" />
 						:
-						<Spinner color='white' />
+						<Spinner color='white'/>
 					}
 				</TouchableHighlight>
 				{
@@ -313,15 +347,10 @@ export default class MainAppScreen extends Component {
 	}
 
 	async handleJoinClick() {
-		if (this.state.name.length == 0 || this.state.joinState != 'ready') {
-			console.log('handleClick', this.state.joinState)
-			return;
-		}
-
-		console.log('handleClick2')
-		this.setState({
+		if (this.state.joinState=="ready"){
+			this.setState({
 			joinState: "joining"
-		});
+			});
 		let callbacks = {
 			joined: this.handleJoined.bind(this),
 			friendConnected: this.handleFriendConnected.bind(this),
@@ -329,15 +358,26 @@ export default class MainAppScreen extends Component {
 		}
 
 		api.get_room(this.state.accessToken).then((response) => {
-			console.log(response)
 			this.setState({
 				friendId:response.friend_id,
 				alreadyFriends:response.user_is_friend,
 				friendRequest:response.user_is_friend_request,
 				friendRequested:response.user_is_friend_requested,})
-				console.log(this.state)
 			webRTCServices.join(response.room_token, this.state.name, callbacks);
 		})
+		
+	}
+		if (this.state.name.length == 0 || this.state.joinState != 'ready') {
+				this.setState({
+				joinState:"ready",
+				alreadyFriends:null,
+				friendRequest:null,
+				friendRequested:null,
+				socketId:null,
+				friendId:null,
+				friendRequstedFromId:null,})
+		}
+		
 	}
 
 	//----------------------------------------------------------------------------

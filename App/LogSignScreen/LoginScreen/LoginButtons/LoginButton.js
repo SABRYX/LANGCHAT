@@ -43,7 +43,7 @@ export default class LoginButton extends Component {
 		var errorMessage = '';
 		if (!this.state.isLogin) {
 			if (!this.state.canLogin) {
-				GLOBAL.showToast(language.checkFields);
+				// GLOBAL.showToast(language.checkFields);
 			} else {
 				this.setState({ isLogin: true });
 				//GLOBAL.showToast(`Email: ${this.state.email}, password: ${this.state.password}`);

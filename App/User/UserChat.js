@@ -11,6 +11,10 @@ import storage from '../services/storage'
 import api from '../services/api';
 import { GiftedChat, Send } from 'react-native-gifted-chat'
 import { globals } from "../services/globals";
+const socketIOClient = require('socket.io-client');
+let socket = socketIOClient('http://192.168.1.30:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
+
+var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
 
 export default class UserChat extends Component {
 
@@ -49,6 +53,12 @@ export default class UserChat extends Component {
         //    this.props.action;
            this.setState({screen:1})
         })
+        
+        socket.on('custom_message', function (data) {
+            if (data.type=="message"){console.log(data)}
+            
+        });
+        
     }
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress');
@@ -63,16 +73,6 @@ export default class UserChat extends Component {
                     element.created_at = new Date(element.created_at)
                 })
 
-                // await storage.setItem('chat_' + this.state.friend_id, response.data)
-
-                // let data;
-                // if (messages !== null) {
-                //     if (response.data.length > messages)
-                //         data = response.data
-                //     else data = messages
-                // }
-                // else data = response.data
-
                 this.setState(previousState => ({
                     messages: GiftedChat.append(previousState.messages, response.data),
                     page: this.state.page + 1
@@ -83,7 +83,7 @@ export default class UserChat extends Component {
 
     onSend(messages = []) {
         api.send_message(this.state.friend_id, messages[0].text, accessToken).then((response) => {
-            globals.mainSocket.emit('chat_message', {
+            globals.mainSocket.emit('custom_message', {type:"message",
                 user_id: this.state.friend_id,
                 last_message_time: response.message.last_message_time,
                 last_message_date: new Date(response.message.last_message_date),
@@ -109,15 +109,15 @@ export default class UserChat extends Component {
             <TouchableOpacity onPress={() => {
                 if (props.text.trim().length > 0)
                     this.state.chatRef.onSend({ text: props.text.trim() }, true)
-            }} style={{ position: 'absolute', top: 0, right: 0, }}>
-                <Icon name="send" style={{ color: props.text.trim().length > 0 ? "#3f51b5" : "#efefef" }} />
+            }} style={{ position: 'relative', top: 0, right: 0, }}>
+                <Icon name="send" style={{ color: "deepskyblue"}} />
             </TouchableOpacity>
         );
     }
 
     render() {
         return (
-             <Container style={{ backgroundColor: 'white', flex: 1, }}>
+             <Container style={{ backgroundColor: 'white', flex: 2, }}>
 
             <GiftedChat
                 messages={this.state.messages}

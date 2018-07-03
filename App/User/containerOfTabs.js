@@ -52,25 +52,7 @@ export default class containerOfTabs extends Component {
 
     render() {
         return (
-            <Container style={{ backgroundColor: 'white', flex: 1 }}>
-                <Header style={{ marginTop: 15 }} noShadow hasTabs>
-                    <Left>
-                        <Button transparent onPress={() => this.onBackPressed()}>
-                            <Icon name='arrow-back' />
-                        </Button>
-                    </Left>
-                    <Body>
-                        <Title></Title>
-                    </Body>
-                </Header>
-                    <Tabs>
-                        <Tab heading="User Friends">
-                            <UserFriends />
-                        </Tab>
-                        <Tab heading="Friend Requests">
-                            <FriendRequest />
-                        </Tab>
-                    </Tabs>
+            <Container style={{ backgroundColor: 'white', flex: 1,marginTop:100 }}>
             </Container>
         )
     }

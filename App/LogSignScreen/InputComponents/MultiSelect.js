@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import { Item, Icon, Input, Button } from 'native-base';
 
 const {width, height} = Dimensions.get('window');
-const modalViewHeight = height*7/10;
+const modalViewHeight = height*4/10;
 const modalViewWidth = width*8/10 > 275 ? 275 : width*8/10;
 const modalHeaderHeight = 40; //change it to 50 if you want to add header
 const modalFooterHeight = 50;
@@ -144,12 +144,15 @@ class MultiSelect extends Component {
 				<View style={styles.modalView}>
 					{/* HEADER SECTION */}
 					<View style={styles.modalHeader}>
+						<Text style={{color:"white",marginRight:"20%"}}>Languages</Text>
 						<TouchableOpacity onPress={() => this.setModalVisible(false)}>
 							<Icon
 								name="md-close"
 								style={{padding: 15, color: '#fff'}}
 							/>
 						</TouchableOpacity>
+						
+						
 					</View>
 
 					{/* CONTENT SECTION */}

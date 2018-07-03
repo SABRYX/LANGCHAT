@@ -12,6 +12,7 @@ class Language {
           name: 'Name',
           password: 'Password',
           repeat: 'Repeat Password',
+          newPassword:"New Password",
           checkFields: 'Fill in all fields.',
           loginSuccess: 'Login successful.',
           dontRemember: 'Forgot your password?',

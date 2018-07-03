@@ -36,14 +36,14 @@ export default class SignInScreen extends Component {
     this.setState(this.state);
   }
 
-  changeInputFocus = index => () => {
-    if (index < 5) {
-      this.state.inputs[index + 1].state.inputRef._root.focus(); // eslint-disable-line
-      if (index >= 1) {
-        this.props.scroll(index);
-      }
-    }
-  };
+  // changeInputFocus = index => () => {
+  //   if (index < 5) {
+  //     this.state.inputs[index + 1].state.inputRef._root.focus(); // eslint-disable-line
+  //     if (index >= 1) {
+  //       this.props.scroll(index);
+  //     }
+  //   }
+  // };
 
   updateCanRegisterState = () => {
     const pass = this.state.inputs[2].state.value;
@@ -106,19 +106,19 @@ export default class SignInScreen extends Component {
       >
         <Form style={GLOBAL.loginScreenStyle.form}>
           <Name
-            changeFocus={this.changeInputFocus(0)}
+            // changeFocus={this.changeInputFocus(0)}
             update={this.updateCanRegisterState}
             ref={(ref) => { this.state.inputs[0] = ref; }}
             shown={this.state.zIndex === 2}
           />
           <Email
-            changeFocus={this.changeInputFocus(1)}
+            // changeFocus={this.changeInputFocus(1)}
             update={this.updateCanRegisterState}
             special
             ref={(ref) => { this.state.inputs[1] = ref; }}
           />
           <Password
-            changeFocus={this.changeInputFocus(2)}
+            // changeFocus={this.changeInputFocus(2)}
             update={this.updateCanRegisterState}
             special
             ref={(ref) => { this.state.inputs[2] = ref; }}

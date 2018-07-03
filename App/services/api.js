@@ -85,6 +85,12 @@ const api =  {
     get_friend_requests_count: async (accessToken) => {
         return await apiFetch(config.urls.get_friend_requests_count, methods.get, null, accessToken);
     },
+    remove_friend: async (to, accessToken) => {
+        return await apiFetch(config.urls.remove_friend, methods.post,JSON.stringify({ friend_id: to }), accessToken);
+    },
+    get_messages_count: async (accessToken) => {
+        return await apiFetch(config.urls.get_messages_count, methods.get, null, accessToken);
+    },
 }
 
 module.exports = api;

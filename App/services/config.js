@@ -21,6 +21,8 @@ const config = {
         reject_friend_request:`${API}/friend/reject_friend_request`,
         add_friend:`${API}/friend/add_friend`,
         get_friend_requests_count:`${API}/friend/get_friend_requests_count`,
+        remove_friend:`${API}/friend/remove_friend`,
+        get_messages_count:`${API}/friend/get_messages_count`,
     }
 }
 

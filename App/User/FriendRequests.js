@@ -10,6 +10,7 @@ import config from "../../src/config/app.js";
 import styles from "../../style/app.js";
 import storage from '../services/storage'
 import api from '../services/api';
+import { NavigationActions } from 'react-navigation' ;
 import { globals } from "../services/globals";
 import UserChat from "./UserChat";
 
@@ -19,7 +20,7 @@ export default class FriendRequest extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            screen: 1,
+            screen: 3,
             dataLoaded: "Loading",
             friends: [],
             currentFriend: null,
@@ -28,30 +29,30 @@ export default class FriendRequest extends Component {
     }
 
     componentDidMount() {
-        console.log("hola")
         BackHandler.addEventListener('hardwareBackPress', () => {
             if (this.state.screen == 1) {
-                this.props.navigation.state.params.onNavigateBack()
-                this.props.navigation.goBack()
+            this.props.navigation.dispatch(NavigationActions.reset(
+              {
+                 index: 0,
+                 actions: [
+                   NavigationActions.navigate({ routeName: 'MainAppScreen'})
+                 ]
+               }))
                 return true;
             }
-            else this.setState({ screen: 1 })
+            else {this.setState({ screen: 1 });this.props.navigation.goBack();}
 
             return true;
         });
 
         storage.getItem(storage.keys.accessToken).then((result) => {
             this.accessToken = result
-            
             api.get_all_requests(result).then((response) => {
-                console.log("hi im response",response)
-                console.log(response)
                 response.data.forEach((element) => {
                     this.state.friends.push(element)
                     console.log(element)
                 });
-                this.setState({ screen: 1, dataLoaded: "done" })
-                console.log(this.state.friends);
+                this.setState({ screen: 3, dataLoaded: "done" })
             })
         })
     }
@@ -91,7 +92,7 @@ export default class FriendRequest extends Component {
 
     renderBody() {
         console.log(this.state.dataLoaded)
-        if (this.state.screen == 1) {
+        if (this.state.screen == 3) {
             return (
 
                 <Content style={{ width: config.screenWidth }}>
@@ -156,23 +157,6 @@ export default class FriendRequest extends Component {
     render() {
         return (
             <Container style={{ backgroundColor: 'white', flex: 1 }}>
-        <Header style={{ marginTop: 20 }} noShadow>
-            <Left>
-                <Button transparent onPress={() =>{
-                    if (this.state.screen == 1) {
-                        this.props.navigation.state.params.onNavigateBack()
-                        this.props.navigation.goBack()
-                        return true;
-                    }
-                    else this.setState({ screen: 1 })
-                    }}>
-                    <Icon name='arrow-back' />
-                </Button>
-            </Left>
-            <Body>
-                <Title></Title>
-            </Body>
-        </Header>
             <Content style={{ backgroundColor: 'white', flex: 1 }}>
            
                 {this.renderBody()}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, ScrollView, BackHandler } from 'react-native';
+import { View, Image, ListView, BackHandler } from 'react-native';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
     Title, Text, Spinner, List, ListItem,Badge
@@ -18,6 +18,7 @@ export default class UserFriends extends Component {
 
     constructor(props) {
         super(props);
+        this.ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         this.state = {
             screen: 1,
             dataLoaded: "Loading",
@@ -26,25 +27,23 @@ export default class UserFriends extends Component {
             userChatRef: null,
             last_message:null,
             messageWritten:null,
-            BadgeCount:0,
-            useBackButton:true,
+            BadgeCount:1,
         }
     }
     componentWillMount(){
         this.getMessagesMain();
-        this.getFriendRequestCount(); 
+        this.getFriendRequestCount();
+        console.log(this.props.navigation.state)
+        BackHandler.addEventListener('hardwareBackPress', () => {
+            if(this.state.screen==1){
+             this.props.navigation.goBack("1")
+             console.log("wentBack")
+             return true;
+            }else {this.getMessagesMain();this.setState({screen:1});this.props.navigation.goBack("1");console.log("hohohohohohohohohohohohohohoohoh")}
+          }); 
     }
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress');
-    }
-    componentDidMount(){
-        BackHandler.addEventListener('hardwareBackPress', () => {
-            if(this.state.useBackButton||this.state.screen==1){
-             this.props.navigation.goBack()
-             console.log("wentBack")
-             return true;
-            }else {this.getMessagesMain();this.setState({screen:1});}
-          });
     }
 
     getMessagesMain(){
@@ -69,7 +68,9 @@ export default class UserFriends extends Component {
                 if (data.user_id == globals.user.id) {
                     let friends = this.state.friends;
                     let _friend = null;
+                    console.log("hoola")
                     friends.forEach((friend, index) => {
+                        console.log(friend)
                         if (friend.user.id == data.message.user._id) {
                             friend.last_message = data.message.text
                             friend.last_message_time = data.last_message_time
@@ -111,6 +112,19 @@ export default class UserFriends extends Component {
             })
         })
     }
+    deleteRow(secId, rowId, rowMap,data) {
+        storage.getItem(storage.keys.accessToken).then((result) => {
+            accessToken = result
+            console.log(accessToken)
+            console.log(data.id)
+            api.remove_friend(data.id,accessToken).then((response)=>{
+                console.log(response)})
+        })
+        rowMap[`${secId}${rowId}`].props.closeRow();
+        const newData = [...this.state.friends];
+        newData.splice(rowId, 1);
+        this.setState({ friends: newData });
+      }
 
     renderBody() {
         if (this.state.screen == 1) {
@@ -119,9 +133,8 @@ export default class UserFriends extends Component {
                 <Content style={{ width: config.screenWidth,height:config.screenHeight,flex:1 }}>
                     {
                         this.state.dataLoaded == "done" && this.state.friends != false ? 
-                        <List style={{marginTop: 0}} dataArray={this.state.friends.sort((a,b) => {
-                            return new Date(b.last_message_date) - new Date(a.last_message_date);
-                        })}
+                        <List style={{marginRight:"2%",marginLeft:"2%"}}
+                            dataSource={this.ds.cloneWithRows(this.state.friends)}
                             renderRow={(friend, s1, index) =>
                                     <ListItem
                                         onPress={() =>{ this.setState({ screen: 2, currentFriend: friend,last_message:friend.last_message,useBackButton:false });console.log("working") /* this.props.currentFriends(friend);console.log(friend) */} }
@@ -149,7 +162,14 @@ export default class UserFriends extends Component {
                                                     <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message_time}</Text>
                                                 </Right>
                                             </ListItem>
-                                        }>
+                                        }
+                                        renderRightHiddenRow={(data, secId, rowId, rowMap) =>
+                                            <Button full danger onPress={_ => this.deleteRow(secId, rowId, rowMap,data)}>
+                                              <Icon active name="trash" />
+                                            </Button>}
+                                        rightOpenValue={-75}
+                                        disableLeftSwipe={false}
+                                        >
                                 </List>
                         :
                       null
@@ -183,36 +203,8 @@ export default class UserFriends extends Component {
 
 
     render() {
+        const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         return (<Container style={{ backgroundColor: 'white', flex: 1 }}>
-        <Header style={{ marginTop:20 }} noShadow>
-            <Left>
-                <Button transparent onPress={() =>this.props.navigation.goBack()}>
-                    <Icon name='arrow-back' />
-                </Button>
-            </Left>
-            <Body>
-                <Title></Title>
-            </Body>
-            <Right> 
-                <Button transparent onPress={() =>{
-                        this.props.navigation.navigate('FriendRequest', { onNavigateBack: this.backToChat});
-                        this.setState({ 
-                            screen: 1,
-                            dataLoaded: "Loading",
-                            friends: [],
-                            currentFriend: null,
-                            userChatRef: null,
-                            last_message:null,
-                            messageWritten:null,
-                            BadgeCount:1,
-                            useBackButton:true,
-                            })}}>
-                        <Icon name='user-follow' type="SimpleLineIcons" style={{marginRight:"8%"}} />
-                        
-                </Button>
-                {this.badgeGenerator()}
-            </Right>
-        </Header>
             <Content style={{ backgroundColor: 'white', flex: 1 }}>
                 {
                     this.state.screen != 1 ? (

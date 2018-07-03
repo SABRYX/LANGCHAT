@@ -101,7 +101,7 @@ export default class NewPassword extends Component {
           returnKeyType={keyType}
           ref={(ref) => { this.state.inputRef = ref; }}
           autoCapitalize="none"
-          placeholder={language.repeat}
+          placeholder={language.newPassword}
           onSubmitEditing={this.props.changeFocus}
           secureTextEntry={this.state.showPassword}
           onChangeText={this.updateText}
