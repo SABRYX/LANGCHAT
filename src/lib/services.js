@@ -4,8 +4,10 @@ import {globals} from "../../App/services/globals.js";
 import api from '../../App/services/api';
 import { EventRegister } from 'react-native-event-listeners'
 import InCallManager from 'react-native-incall-manager';
+import {Platform} from "react-native"
 
-
+let speaker = false ; 
+let mic = false ; 
 let onFriendLeftCallback = null;
 let onLeave = null;
 let onFriendConnectedCallback = null;
@@ -13,7 +15,7 @@ let onDataChannelMessageCallback = null;
 let onFriendRequsted = null;
 
 const socketIOClient = require('socket.io-client');
-let socket = socketIOClient('http://192.168.1.30:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
+let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });
 
 var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
 var peerConnections = {}; //map of {socketId: socket.io id, RTCPeerConnection}
@@ -239,14 +241,30 @@ function join(roomId, name, callbacks) {
 				name: name
 			}
 			callbacks.joined();
-			InCallManager.start({media: 'audio'});
-			InCallManager.setForceSpeakerphoneOn(true);
+			inCallManagerHandler()
+			
 		}}
 		else if(friends==[]){
 			this.join(roomId, name, callbacks);
 		}
 	});
 	// console.log("cortana")
+}
+
+function inCallManagerHandler(){
+	if (Platform.OS === 'ios'){
+		if (InCallManager.getIsWiredHeadsetPluggedIn()){
+			InCallManager.start();
+		}else{
+			InCallManager.setForceSpeakerphoneOn(true)
+		}
+	}else if (Platform.OS === 'android'){
+		InCallManager.start();
+		InCallManager.setSpeakerphoneOn(true)
+		InCallManager.setForceSpeakerphoneOn(speaker)
+		InCallManager.setMicrophoneMute(mic)
+		
+	}
 }
 
 function exitCallFromOtherUser(accessToken,friend_id,callbacks){
@@ -266,6 +284,15 @@ function leave(socketId) {
 function exitCall(socketId){ 
 	leave(socketId)
 }
+function mutateMicAndSpeaker (value) {
+	if(value=="mic"){
+		this.mic=!this.mic
+		console.log(this.mic)
+	}else if (value=="speaker"){
+		this.speaker=!this.speaker
+		console.log(this.speaker)
+	}
+}
 
 
 
@@ -279,6 +306,8 @@ module.exports = {
 	broadcastMessage,
 	leave,
 	exitCallFromOtherUser,
-	exitCall
+	exitCall,
+	mutateMicAndSpeaker
+
 	
 }

@@ -27,9 +27,9 @@ const api =  {
         });
         return await apiFetch(config.urls.login, methods.post, body);
     },
-    register: async (name, email, password, avatar, langauges) => {
+    register: async (name, email,phone, password, languages) => {
         let body = JSON.stringify({
-            name: name, email, password, avatar, langauges
+            name: name, email:email,phone:phone, password:password, languages
         });
         return await apiFetch(config.urls.register, methods.post, body);
     },
@@ -51,6 +51,9 @@ const api =  {
     },
     me: async (accessToken) => {
         return await apiFetch(config.urls.me, methods.post, null, accessToken);
+    },
+    check_token:async (old_token,accessToken) => {
+        return await apiFetch(config.urls.check_token, methods.post, JSON.stringify({ old_token: old_token }),accessToken);
     },
     refresh: async (accessToken) => {
         return await apiFetch(config.urls.refresh, methods.post, null, accessToken);
@@ -90,6 +93,9 @@ const api =  {
     },
     get_messages_count: async (accessToken) => {
         return await apiFetch(config.urls.get_messages_count, methods.get, null, accessToken);
+    },
+    cancel_request: async (accessToken) => {
+        return await apiFetch(config.urls.cancel_request, methods.post, null, accessToken);
     },
 }
 

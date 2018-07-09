@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
+import {AsyncStorage} from "react-native"
 import { View } from 'react-native-animatable';
 import { Text, Spinner, Button } from 'native-base';
-import { Actions } from 'react-native-router-flux';
 import PropTypes from 'prop-types';
 import api from '../../services/api'
-import storage from '../../services/storage';
+
 
 const inputNames = ['name','password','email','languages']
 
@@ -16,19 +16,21 @@ export default class RegisterButton extends Component {
       canRegister: false,
       name: null,
       email: null,
+      phone:null,
       password: null,
       repeat: null,
       avatar: null,
-      langauges: [1,2],
+      languages: [1,2],
     };
   }
 
-  updateCanRegister = (can, name, email, password, langauges) => {
-    this.setState({canRegister: can, name, email, password, langauges});
+  updateCanRegister = (can, name, email,phone, password, languages) => {
+    this.setState({canRegister: can, name, email,phone, password, languages});
+    console.log("update register is called")
   };
 
 	moveToMainAppScreen = () => {
-		Actions.push('mainAppScreen');
+		this.props.navigation.navigate("MainAppScreen")
   };
   
   errorParser(error){
@@ -43,22 +45,27 @@ export default class RegisterButton extends Component {
   }
 
   registerUser = () => {
-    let {isRegistering, canRegister, name, email, password, repeat, avatar, langauges} = this.state;
+    let {isRegistering, canRegister, name, email,phone, password, repeat, avatar, languages} = this.state;
+    console.log(name, email,phone, password, repeat, avatar, languages)
     if (!isRegistering) {
       if (!canRegister) {
-        GLOBAL.showToast(language.checkFields);
+        alert("cant register")
       } else {
         this.setState({ isRegistering: true });
-				api.register(name, email, password, avatar, langauges).then((result) => {
+				api.register(name, email, phone, password, languages).then((result) => {
+          console.log(name, email,phone, password, languages)
+          console.log(result)
+          if(result.message!="The given data was invalid."){
           if(result.type !== 'error'){
-            GLOBAL.showToast(language.accountCreated);
-            storage.setItem(storage.keys.accessToken, result.access_token);
-            storage.setItem(storage.keys.name, result.name);
+            alert("account Created")
+            this.storeData(result)
             this.moveToMainAppScreen();  
-            this.props.clear();
+            this.props.clear();}
           }else if(result.type == 'error'){
             var error = this.errorParser(result.message);
             this.props.postErrorMessage(error);
+          }else{
+            alert("you can't register ya sara 5alas")
           }
           
           this.setState({ isRegistering: false, canRegister: false });
@@ -68,8 +75,20 @@ export default class RegisterButton extends Component {
       }
     }
   };
+  
+  
+    storeData = async (response) => {
+      try {
+        console.log(response)
+        await AsyncStorage.setItem("accessToken",response.access_token);
+        await AsyncStorage.setItem("name", response.name);
+      } catch (error) {
+        console.log(error)
+      }
+      }
 
   render() {
+    const { navigate } = this.props.navigation;
     let animationType;
     let registerColor;
 
@@ -87,7 +106,7 @@ export default class RegisterButton extends Component {
     }
 
     return (
-      <View animation={animationType} iterationCount="infinite" duration={500}>
+      <View>
         <Button
           bordered
           rounded

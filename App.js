@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, TouchableHighlight, View, ListView, Image, TextInput, DeviceEventEmitter } from 'react-native';
-import { RTCView } from 'react-native-webrtc';
+import { Text, TouchableHighlight, View, Image, TextInput} from 'react-native';
 import Thumbnails from "./src/components/Thumbnails.js";
 import FullScreenVideo from "./src/components/FullScreenVideo.js";
-import Commons from "./src/lib/commons.js";
 import styles from "./style/app.js";
-import config from "./src/config/app.js";
-import InCallManager from 'react-native-incall-manager';
+
 
 const sampleStreamURLs = [
 	require("./image/sample-image-1.jpg"),

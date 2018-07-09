@@ -1,4 +1,4 @@
-const SERVER = 'http://192.168.1.85:1994/';
+const SERVER = 'http://192.168.1.9:1994/';
 const STORAGE = `${SERVER}/storage/`;
 const API = `${SERVER}/api`;
 const config = {
@@ -11,6 +11,7 @@ const config = {
         get_languages: `${API}/get_languages`,
         refresh: `${API}/auth/refresh`,
         me: `${API}/auth/me`,
+        check_token:`${API}/auth/check_token`,
         get_room: `${API}/room/get_room`,
         leave_room: `${API}/room/leave_room`,
         get_all_friends: `${API}/friend/get_all_friends`,
@@ -23,6 +24,7 @@ const config = {
         get_friend_requests_count:`${API}/friend/get_friend_requests_count`,
         remove_friend:`${API}/friend/remove_friend`,
         get_messages_count:`${API}/friend/get_messages_count`,
+        cancel_request:`${API}/room/cancel_request`,
     }
 }
 

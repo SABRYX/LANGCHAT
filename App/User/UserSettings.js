@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, ScrollView,BackHandler} from 'react-native';
+import { View, ScrollView,BackHandler,Image} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title, Text, Form, Spinner } from 'native-base';
 import config from "../../src/config/app.js";
 import styles from "../../style/app.js";
@@ -12,6 +12,8 @@ import MultiSelect from '../LogSignScreen/InputComponents/MultiSelect';
 import PhotoUpload from 'react-native-photo-upload'
 import NewPassword from "../LogSignScreen/InputComponents/NewPassword"
 import { NavigationActions } from 'react-navigation' ;
+
+
 export default class UserSettings extends Component {
     accessToken;
 
@@ -33,19 +35,19 @@ export default class UserSettings extends Component {
         await storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
             api.me(result).then((response) => {
+                console.log(response)
                 this.setState({oldResponse:response})
                 this.setState({dataLoaded: "done"})
                 this.state.inputs[0].changeText(response.name)
                 this.state.inputs[3].setSelectedItems(response.languages)
                 this.setState({
-                    userAvatar: {
-                        uri: response.avatar
-                    }
+                    userAvatar: response.avatar
                 })
             })
         })
         api.getLanguages().then((languages) => {
             this.setState({ languages })
+            console.log(this.state.languages)
             this.state.inputs[3].loadItems(this.state.languages)
         })
 
@@ -76,7 +78,7 @@ export default class UserSettings extends Component {
         }
     };
 
-    updateProfile = () => {
+    updateProfile =  () => {
         this.setState({dataLoaded: 'Updating'})
        if(this.state.inputs[1].value != "" && this.state.inputs[2].value != "" && this.state.inputs[3]!=""){
             api.updateProfile(this.state.inputs[0].state.value,
@@ -85,33 +87,35 @@ export default class UserSettings extends Component {
                           this.state.profileAvatar,
                           this.state.inputs[3].state.value,
                           accessToken).then((response) => {
-                            console.log(response)
-                            if (response.error == "These credentials do not match our records."){
-                                alert(response.error);
+                            console.log("response",response)
+                            console.log("response error",response.error)
+                            if (response.error === "These credentials do not match our records."){
                                 this.returnOldProfile(this.state.oldResponse)
-                                console.log(this.state.oldResponse)
+                                alert("Sorry The Data You Filled In Is Wrong !!")
                         }else {
                             this.setState({dataLoaded: 'done'})
                             this.state.inputs[0].changeText(response.data.name)
                             this.state.inputs[3].setSelectedItems(response.data.languages)
-                            this.setState({
-                                userAvatar: {
-                                    uri: response.data.avatar
-                                }
-                            })
+                            this.getImage();
                             }
                           })
                           }
     }
+    getImage = async ()=>{
+        await storage.getItem(storage.keys.accessToken).then((result) => {
+            accessToken = result
+            api.me(result).then((response) => {
+                this.setState({
+                    userAvatar: response.avatar
+                })
+            })
+        })
+    }
     returnOldProfile(oldResp){
                 this.setState({dataLoaded: "done"})
+                this.setState({inputs:[]})
                 this.state.inputs[0].changeText(oldResp.name)
                 this.state.inputs[3].setSelectedItems(oldResp.languages)
-                this.setState({
-                    userAvatar: {
-                        uri: oldResp.avatar
-                    }
-                })
     }
 
     render() {
@@ -147,7 +151,7 @@ export default class UserSettings extends Component {
                                                     borderRadius: 140
                                                 }}
                                                 resizeMode='cover'
-                                                source={this.state.userAvatar}
+                                                source={{uri:this.state.userAvatar}}
                                                 ref={(ref) => { this.state.inputs[3] = ref; }}
                                             />
                                         </PhotoUpload>

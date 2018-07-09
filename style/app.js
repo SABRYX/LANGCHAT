@@ -118,6 +118,18 @@ export default StyleSheet.create({
     zIndex: 1,
     //borderWidth: 1, borderColor: "white"
   },
+  speakerMicContainer:{
+    position: "absolute",
+    width: 45,
+    height: 120,
+    top: 250,
+    left: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+  },
   alreadyFriendsButton:{
     display: 'flex',
     alignItems: 'center',
@@ -151,6 +163,16 @@ export default StyleSheet.create({
     justifyContent: 'center',
     width: "90%",
     height: "90%",
+    borderRadius: 100,
+    backgroundColor: "yellow"
+  },
+  micAndSpeaker:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: "90%",
+    height: "35%",
+    marginBottom:"20%",
     borderRadius: 100,
     backgroundColor: "yellow"
   }

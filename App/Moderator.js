@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { View, StatusBar, Platform, BackHandler,Image } from 'react-native';
+import { View, StatusBar, Platform, BackHandler,Image,AsyncStorage } from 'react-native';
 import { Root,Header } from "native-base";
 import Toast, { DURATION } from 'react-native-easy-toast';
 import SplashScreen from 'react-native-splash-screen';
 import AppGlobalConfig from './AppGlobalConfig/AppConfig';
 import storage from './services/storage';
+import api from './services/api';
+import { globals } from "./services/globals";
+import webRTCServices from "../src/lib/services";
 let context;
 
 // GLOBAL.showToast = (message) => {
@@ -30,20 +33,36 @@ export default class Moderator extends Component {
 		});
 	}
 
-	async checkUserExists() {
-        let accessToken = await storage.getItem(storage.keys.accessToken);
-        console.log(accessToken)
-		if (accessToken !== null) {
-            setTimeout(() => this.props.navigation.navigate("MainAppScreen"),4000);
-			
-		} else {
-            console.log('didnt find user')
-            setTimeout(() => this.props.navigation.navigate("LogSignScreen"),4000);
-		}
-	}
+		retrieveData = async () => {
+			try {
+			  const value = await AsyncStorage.getItem('accessToken');
+			  const accessTokennn = await AsyncStorage.getItem('accessToken');
+			  console.log(accessTokennn)
+			  if (value !== null) {
+				api.check_token(value,accessTokennn).then((response) => {
+					if (response.message == "Unauthenticated.") {
+							this.props.navigation.navigate("LogSignScreen")
+					}
+					else {
+						this.setState({accessToken: response.access_token})
+						this.setState({name: response.name})
+						globals.user = response
+						webRTCServices.myId=response.id
+						this.props.navigation.navigate("MainAppScreen")
+	
+					}
+				})
+			  }else{
+				this.props.navigation.navigate("LogSignScreen")
+			  }
+			 } catch (error) {
+			   console.log("error",error)
+			 }
+		  }
+	
 
 	componentDidMount() {
-		this.checkUserExists();
+		this.retrieveData();
 		if (Platform.OS === 'android') {
 			StatusBar.setTranslucent(true);
 			StatusBar.setBackgroundColor('black');

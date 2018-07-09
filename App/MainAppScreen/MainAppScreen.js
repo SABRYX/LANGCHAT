@@ -1,38 +1,22 @@
 import React, { Component } from 'react';
-import { StyleSheet, TouchableHighlight, View, ListView, Image, TextInput, DeviceEventEmitter,BackHandler,TouchableOpacity } from 'react-native';
-import { RTCView } from 'react-native-webrtc';
+import { TouchableHighlight, View, Image,BackHandler,TouchableOpacity,AsyncStorage,Platform } from 'react-native';
 import { Button, Text, Icon, Spinner,Fab, Container } from 'native-base';
 import Thumbnails from "../../src/components/Thumbnails.js";
 import FullScreenVideo from "../../src/components/FullScreenVideo.js";
-import Commons from "../../src/lib/commons.js";
 import styles from "../../style/app.js";
-import config from "../../src/config/app.js";
-import InCallManager from 'react-native-incall-manager';
 import storage from '../services/storage'
 import webRTCServices from '../../src/lib/services.js';
-import {Dimensions} from 'react-native';
-import Pulse from 'react-native-pulse';
-import Colors from '../AppGlobalConfig/Colors/Colors';
 import api from '../services/api';
-import { EventRegister } from 'react-native-event-listeners'
 import GestureRecognizer  from 'react-native-swipe-gestures'; 
-
-
-//const sampleFullScreenURL = require("./image/sample-image-2.jpg");
-const logo = require("../../image/logo.png");
-const FRONT_CAMERA = true;
-const VIDEO_CONFERENCE_ROOM = "video_conference";
-
-const SELF_STREAM_ID = "self_stream_id";
-const iconWidth = (width * 52) / 100;
-
-const langChat = require('../../assets/langchat.png');
-const doubleTapImage = require('../../assets/double_tap.png');
 import { globals } from "../services/globals";
 const socketIOClient = require('socket.io-client');
-let socket = socketIOClient('http://192.168.1.30:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
-
+let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });
 var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
+const logo = require("../../image/logo.png");
+const SELF_STREAM_ID = "self_stream_id";
+
+
+
 
 
 export default class MainAppScreen extends Component {
@@ -56,39 +40,51 @@ export default class MainAppScreen extends Component {
 			friendRequstedFromId:null,
 			BadgeCount:0,
 			fabActive:false,
+			speaker:false,
+			mic:false,
 		}
 	}
 
+
+
 	async componentWillMount() {
 		this.getLocalStream();
-		await storage.getItem(storage.keys.accessToken).then((accessToken) => {
-			this.setState({accessToken})
-			api.refresh(accessToken).then((response) => {
-				if (response.message && response.message == "Unauthenticated.") {
-					api.logout(accessToken).then(() => {
-						storage.removeItem(storage.keys.accessToken)
-						storage.clear()
-						this.props.navigation.navigate("LogSignScreen")
-					})
-				}
-				else {
-					this.setState({accessToken: response.access_token})
-					storage.setItem(storage.keys.accessToken, response.access_token)
-					this.setState({name: response.user.name})
-					storage.setItem(storage.keys.name, response.user.name)
-					storage.setItem(storage.keys.user, response.user)
-					globals.user = response.user
-					webRTCServices.myId=response.user.id
-
-				}
-			})
-		})
-		
+		this.retrieveData();
 	}
+	
+	retrieveData = async () => {
+		try {
+		  const value = await AsyncStorage.getItem('accessToken');
+		  console.log(value)
+		  if (value !== null) {
+			api.me(value).then((response) => {
+				console.log(response)
+				this.setState({accessToken:response.token})
+				storage.setItem(storage.keys.accessToken, response.token)
+				this.setState({name: response.name})
+				storage.setItem(storage.keys.name, response.name)
+				storage.setItem(storage.keys.user, response)
+				globals.user = response
+				webRTCServices.myId=response.id
+				storeData = async (response) => {
+					try {
+					  await AsyncStorage.setItem("accessToken",response.token);
+					  await AsyncStorage.setItem("name", response.name);
+					  await AsyncStorage.setItem("user", response);
+					} catch (error) {
+					  console.log(error)
+					}
+				  }
+			})
+		  }
+		 } catch (error) {
+		   
+		 }
+	  }
+
 	componentDidMount(){
 		BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
 		socket.on('custom_message', (data) => {
-			console.log("recived a custom message")
 			if (data.type == 'exitCall'){
 					if (globals.user.id===data.your_id){
 						this.handleFriendLeft();
@@ -103,18 +99,24 @@ export default class MainAppScreen extends Component {
 			 }
 		});
 	}
-	componentWillUnmount() {
+
+	async componentWillUnmount() {
 		if (this.state.joinState === "joined" || this.state.joinState === "joining" ){
+			const value = await AsyncStorage.getItem('accessToken');
+			api.cancel_request(value).then((response)=>{console.log(response)})
 			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);
 		  }
 		BackHandler.removeEventListener('hardwareBackPress', ()=> {return this.handleBackButton()});
 	}
-	  handleBackButton() {
+
+	async  handleBackButton() {
 		  if(this.state.joinState === "joined"){
 			this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId);
 			BackHandler.exitApp();
 		  }
 		  else if (this.state.joinState === "joining" ){
+			const value = await AsyncStorage.getItem('accessToken');
+			api.cancel_request(value).then((response)=>{console.log(response)})
 			this.setState({
 				joinState:"ready",
 				alreadyFriends:null,
@@ -123,7 +125,6 @@ export default class MainAppScreen extends Component {
 				socketId:null,
 				friendId:null,
 				friendRequstedFromId:null,})
-				
 		  }else if(this.state.joinState == "ready"){
 			BackHandler.exitApp();
 		  }
@@ -235,6 +236,7 @@ export default class MainAppScreen extends Component {
 				}
 				{this.renderGestureNotification()}
 				{this.renderFriendStates()}
+				{/* {this.renderSpeakerAndMicView()} */}
 
         </Container>
 		</GestureRecognizer>
@@ -284,7 +286,6 @@ export default class MainAppScreen extends Component {
 	}
 	renderFriendStates(){
 		if ( this.state.joinState == "joined" && this.state.hideInfo == true && this.state.gestureNotification == true ){
-			if (this.state.gestureNotification == true){
 			if (this.state.alreadyFriends == true){
 				return(
 					<View style={[styles.friendsContainer]}>
@@ -327,9 +328,30 @@ export default class MainAppScreen extends Component {
 			
 				}
 			return null;
-			}
 		}
 	}
+	// renderSpeakerAndMicView(){
+	// 	if (this.state.joinState==="joined" && Platform.OS === 'android'){
+	// 		return(
+	// 			<View style={[styles.speakerMicContainer]}>
+	// 				<TouchableOpacity style={styles.micAndSpeaker} onPress={()=>{this.setState({speaker:!this.state.speaker}); webRTCServices.mutateMicAndSpeaker("speaker")} }>
+	// 					{ this.state.speaker ?<Icon name="volume-strike" type="Foundation"/>:<Icon name="volume" type="Foundation"/>}
+	// 				</TouchableOpacity>
+	// 				<TouchableOpacity style={styles.micAndSpeaker} onPress={()=>{this.setState({mic:!this.state.mic});webRTCServices.mutateMicAndSpeaker("mic") }}>
+	// 					{ this.state.mic ?<Icon name="microphone-slash" type="FontAwesome"/>:<Icon name="microphone" type="FontAwesome"/>}
+	// 				</TouchableOpacity>
+	// 			</View>
+	// 		)
+	// 	}else if (this.state.joined=== "joined" && Platform.OS === "ios"){
+	// 		return(
+	// 			<View style={[styles.speakerMicContainer]} onPress={()=>{this.setState({mic:!mic}); webRTCServices.mutateMicAndSpeaker("mic")}}>
+	// 				<TouchableOpacity style={styles.micAndSpeaker}>
+	// 					{ this.state.mic ?<Icon name="microphone-slash" type="FontAwesome"/>:<Icon name="microphone" type="FontAwesome"/>}
+	// 				</TouchableOpacity>
+	// 			</View>
+	// 		)
+	// 	}
+	// }
 
 	handleSetActive(streamId) {
 		this.setState({
@@ -367,7 +389,7 @@ export default class MainAppScreen extends Component {
 		})
 		
 	}
-		if (this.state.name.length == 0 || this.state.joinState != 'ready') {
+		if (this.state.joinState != 'ready') {
 				this.setState({
 				joinState:"ready",
 				alreadyFriends:null,
@@ -376,6 +398,8 @@ export default class MainAppScreen extends Component {
 				socketId:null,
 				friendId:null,
 				friendRequstedFromId:null,})
+				const value = await AsyncStorage.getItem('accessToken');
+				api.cancel_request(value).then((response)=>{console.log(response)})
 		}
 		
 	}
@@ -441,8 +465,8 @@ export default class MainAppScreen extends Component {
 	handleSendFriendRequest(to,from){
 		console.log("tooooo",to);
 		globals.mainSocket.emit("custom_message", { type: 'recieveAddFriend', data: { your_id:to,from:from}});
-		console.log(to,this.state.accessToken)	
 		api.add_friend(to,this.state.accessToken).then((response) => {
+			console.log("hello")
 				console.log(response)
 			});
 	}
@@ -454,18 +478,19 @@ export default class MainAppScreen extends Component {
 	handleAcceptFriendRequest(to){
 		if (this.state.friendId==to){
 		api.accept_friend_request(to,this.state.accessToken).then((response) => {
+			console.log("accept_friend_request")
 			console.log(response)
 			console.log("helloitsme")
 			this.setState({alreadyFriends:true});
 		});
 		globals.mainSocket.emit("custom_message", { type: 'acceptedFriendRequest'});
 	}
-		else if(this.state.friendRequstedFromId==null && this.state.friendId!=null){
-			api.accept_friend_request(this.state.friendId,this.state.accessToken).then((response) => {
-				console.log(response)
-			});
-			globals.mainSocket.emit("custom_message", { type: 'acceptedFriendRequest'});
-		}
+		// else if(this.state.friendRequstedFromId==null && this.state.friendId!=null){
+		// 	api.accept_friend_request(this.state.friendId,this.state.accessToken).then((response) => {
+		// 		console.log("accept_friend_request",response)
+		// 	});
+		// 	globals.mainSocket.emit("custom_message", { type: 'acceptedFriendRequest'});
+		// }
 	}
 	acceptedFriendRequest(){
 		this.setState({alreadyFriends:true});

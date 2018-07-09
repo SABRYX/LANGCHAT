@@ -6,6 +6,7 @@ import UserSettings from './User/UserSettings';
 import UserFriends from './User/UserFriends';
 import UserChat from './User/UserChat';
 import FriendRequest from "./User/FriendRequests";
+import SignInScreen from "./LogSignScreen/SignInScreen/SignInScreen"
 import containerOfTabs from "./User/containerOfTabs"
 
 const App = StackNavigator({
@@ -13,11 +14,14 @@ const App = StackNavigator({
     LogSignScreen:{screen:LogSignScreen,navigationOptions: { header: null }},
     MainAppScreen: {screen: MainAppScreen,navigationOptions: { header: null }},
     UserSettings: {screen: UserSettings,navigationOptions: { header: null }},
+    SignInScreen: {screen: SignInScreen,navigationOptions: { header: null }},
+    UserChat:{screen:UserChat},
     Home:{
     screen: TabNavigator({
         UserFriends: { screen: UserFriends },
         FriendRequest: { screen: FriendRequest }
-   },{
+   },
+   {
     tabBarOptions: {style:{marginTop:"0%",backgroundColor:"deepskyblue"},
     },
     initialRouteName: 'UserFriends',

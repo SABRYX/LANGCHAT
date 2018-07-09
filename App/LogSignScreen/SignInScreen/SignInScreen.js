@@ -4,6 +4,7 @@ import { View , Text } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { Form } from 'native-base';
 import Email from '../InputComponents/Email';
+import PhoneNumber from '../InputComponents/PhoneNumber';
 import Password from '../InputComponents/Password';
 import PasswordRepeat from '../InputComponents/PasswordRepeat';
 import Name from '../InputComponents/Name';
@@ -36,14 +37,14 @@ export default class SignInScreen extends Component {
     this.setState(this.state);
   }
 
-  // changeInputFocus = index => () => {
-  //   if (index < 5) {
-  //     this.state.inputs[index + 1].state.inputRef._root.focus(); // eslint-disable-line
-  //     if (index >= 1) {
-  //       this.props.scroll(index);
-  //     }
-  //   }
-  // };
+  changeInputFocus = index => () => {
+    if (index < 5) {
+      this.state.inputs[index + 1].state.inputRef._root.focus(); // eslint-disable-line
+      if (index >= 1) {
+        this.props.scroll(index);
+      }
+    }
+  };
 
   updateCanRegisterState = () => {
     const pass = this.state.inputs[2].state.value;
@@ -53,20 +54,20 @@ export default class SignInScreen extends Component {
       this.state.inputs[2].forceUpdate();
     }
 
-    let canRegister = true;
+      let canRegister = true;
     this.state.inputs.forEach((child) => {
       if (child.state.isCorrect !== 1) {
         canRegister = false;
       }
     });
-    if(!canRegister){
-      console.log('you cant register');
-      this.state.inputs.forEach((child) => {
-        if (child.state.isCorrect !== 1) {
-          console.log(child);
-        }
-      });
-    }
+    // if(!canRegister){
+    //   console.log('you cant register');
+    //   this.state.inputs.forEach((child) => {
+    //     if (child.state.isCorrect !== 1) {
+    //       console.log(child);
+    //     }
+    //   });
+    // }
     if(canRegister){
       console.log('you can register, YAAY');
       this.state.inputs.forEach((child) => {
@@ -79,6 +80,7 @@ export default class SignInScreen extends Component {
       canRegister,
       this.state.inputs[0].state.value, this.state.inputs[1].state.value,
       this.state.inputs[2].state.value, this.state.inputs[3].state.value,
+      this.state.inputs[4].state.value
     );
   };
 
@@ -106,28 +108,34 @@ export default class SignInScreen extends Component {
       >
         <Form style={GLOBAL.loginScreenStyle.form}>
           <Name
-            // changeFocus={this.changeInputFocus(0)}
+             changeFocus={this.changeInputFocus(0)}
             update={this.updateCanRegisterState}
             ref={(ref) => { this.state.inputs[0] = ref; }}
             shown={this.state.zIndex === 2}
           />
           <Email
-            // changeFocus={this.changeInputFocus(1)}
+             changeFocus={this.changeInputFocus(1)}
             update={this.updateCanRegisterState}
             special
             ref={(ref) => { this.state.inputs[1] = ref; }}
           />
+          <PhoneNumber
+             changeFocus={this.changeInputFocus(2)}
+            update={this.updateCanRegisterState}
+            ref={(ref) => { this.state.inputs[2] = ref; }}
+            shown={this.state.zIndex === 2}
+          />
           <Password
-            // changeFocus={this.changeInputFocus(2)}
+            changeFocus={this.changeInputFocus(3)}
             update={this.updateCanRegisterState}
             special
-            ref={(ref) => { this.state.inputs[2] = ref; }}
+            ref={(ref) => { this.state.inputs[3] = ref; }}
           />
           <MultiSelect
             items={this.state.languages}
             update={this.updateCanRegisterState}
             special
-            ref={(ref) => { this.state.inputs[3] = ref; }}
+            ref={(ref) => { this.state.inputs[4] = ref; }}
           />
         </Form>
         <View style={{marginTop: 2, alignSelf: 'center',}}>
@@ -137,6 +145,7 @@ export default class SignInScreen extends Component {
         </View>
         <View style={{ marginTop: height / 50}}>
           <RegisterButton
+            navigation={this.props.navigation}
             switch={this.props.switch}
             clear={this.clearAllInputs}
             ref={(ref) => { this.registerButton = ref; }}

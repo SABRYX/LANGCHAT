@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, Image, ScrollView, TouchableOpacity,BackHandler } from 'react-native';
+import { View, Image, ScrollView, TouchableOpacity,BackHandler,KeyboardAvoidingView,AsyncStorage } from 'react-native';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
     Title, Text, Form, Spinner, List, ListItem, Thumbnail
@@ -12,9 +12,11 @@ import api from '../services/api';
 import { GiftedChat, Send } from 'react-native-gifted-chat'
 import { globals } from "../services/globals";
 const socketIOClient = require('socket.io-client');
-let socket = socketIOClient('http://192.168.1.30:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
+let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });
 
 var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
+
+
 
 export default class UserChat extends Component {
 
@@ -24,14 +26,24 @@ export default class UserChat extends Component {
             screen: 2,
             dataLoaded: "Loading",
             messages: [],
-            friend_name: this.props.data.friend_name,
-            friend_id: this.props.data.friend_id,
+            friend_name: this.props.navigation.state.params.friend_name,
+            friend_id: this.props.navigation.state.params.friend_id,
             chatRef: null,
-            page: 0
+            page: 1,
+            loadEarlier:true,
         }
     }
 
-    async componentDidMount() {
+    static navigationOptions = ({ navigation }) => ({
+        title: `${navigation.state.params.title}`,
+         headerTitleStyle : {textAlign: 'center',alignSelf:'center'},
+            headerStyle:{
+                backgroundColor:'deepskyblue',
+                marginTop:"4%",
+            },
+        });
+
+     componentDidMount() {
         // try {
         //     await storage.getItem('chat_' + this.state.friend_id).then(async (messages) => {
         //         if (messages !== null) {
@@ -49,14 +61,19 @@ export default class UserChat extends Component {
         // }
         this.loadMessages(null)
         BackHandler.addEventListener('hardwareBackPress', () => {
-           console.log("hhhhhhhhhh2");
-        //    this.props.action;
-           this.setState({screen:1})
+            this.props.navigation.goBack()
         })
         
-        socket.on('custom_message', function (data) {
-            if (data.type=="message"){console.log(data)}
-            
+        socket.on('chat_message',  (data)=> {
+            console.log(data)
+            console.log("userChat")
+            console.log(globals.user.id)
+                 if (data.user_id == globals.user.id){
+                    console.log("test",data.message)
+                    this.setState(previousState => ({
+                        messages: GiftedChat.append(previousState.messages,data.message),
+                    }))
+                 }
         });
         
     }
@@ -69,12 +86,19 @@ export default class UserChat extends Component {
             accessToken = result
 
             api.get_messages(this.state.friend_id, this.state.page, accessToken).then(async (response) => {
+                console.log(response)
                 response.data.forEach(element => {
                     element.created_at = new Date(element.created_at)
                 })
+                
+                if (response.meta.current_page == response.meta.last_page){
+                    this.setState({loadEarlier:false})
+                    console.log(response.meta)
+                }
+        
 
                 this.setState(previousState => ({
-                    messages: GiftedChat.append(previousState.messages, response.data),
+                    messages: GiftedChat.prepend(previousState.messages, response.data),
                     page: this.state.page + 1
                 }))
             })
@@ -83,7 +107,8 @@ export default class UserChat extends Component {
 
     onSend(messages = []) {
         api.send_message(this.state.friend_id, messages[0].text, accessToken).then((response) => {
-            globals.mainSocket.emit('custom_message', {type:"message",
+            console.log(globals.mainSocket)
+            globals.mainSocket.emit('chat_message', {
                 user_id: this.state.friend_id,
                 last_message_time: response.message.last_message_time,
                 last_message_date: new Date(response.message.last_message_date),
@@ -91,6 +116,7 @@ export default class UserChat extends Component {
             })
         })
 
+        
         this.setState(previousState => ({
             messages: GiftedChat.append(previousState.messages, messages),
         }))
@@ -107,9 +133,9 @@ export default class UserChat extends Component {
     renderSend = (props) => {
         return (
             <TouchableOpacity onPress={() => {
-                if (props.text.trim().length > 0)
-                    this.state.chatRef.onSend({ text: props.text.trim() }, true)
-            }} style={{ position: 'relative', top: 0, right: 0, }}>
+                    if (props.text.trim().length > 0)
+                        this.state.chatRef.onSend({ text: props.text.trim() }, true)
+            }} style={{ position: 'absolute', top: 6, right: 5,bottom:1,alignContent:"center",alignItems:"center"}}>
                 <Icon name="send" style={{ color: "deepskyblue"}} />
             </TouchableOpacity>
         );
@@ -117,26 +143,23 @@ export default class UserChat extends Component {
 
     render() {
         return (
-             <Container style={{ backgroundColor: 'white', flex: 2, }}>
+             <Container style={{ backgroundColor: 'white', flex:1 }}>
+                
+                <GiftedChat
+                    messages={this.state.messages}
+                    onSend={(messages) => this.onSend(messages)}
+                    loadEarlier={this.state.loadEarlier}
+                    onLoadEarlier={() => this.loadMessages(null)}
+                    renderSend={this.renderSend}
+                    alwaysShowSend ={true}
+                    ref={(ref) => { this.state.chatRef = ref; }}
+                    user={{
+                        _id: globals.user.id,
+                        avatar: globals.user.avatar
+                    }}
+                />
 
-            <GiftedChat
-                messages={this.state.messages}
-                isInitialized= {true}
-                onSend={messages => this.onSend(messages)}
-                loadEarlier={true}
-                onLoadEarlier={() => this.loadMessages(null)}
-                renderSend={this.renderSend}
-                ref={(ref) => { this.state.chatRef = ref; }}
-                user={{
-                    _id: globals.user.id,
-                    avatar: globals.user.avatar
-                }}
-            />
              </Container>
         )
     }
 }
-
-UserChat.propTypes = {
-    data: PropTypes.object.isRequired
-};

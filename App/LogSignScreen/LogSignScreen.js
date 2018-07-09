@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Actions } from 'react-native-router-flux';
+import {BackHandler} from "react-native"
 import { View } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
@@ -14,6 +14,15 @@ import PopupDialogs from './Settings/PopupDialogs/PopupDialogs';
 import Colors from '../AppGlobalConfig/Colors/Colors';
 
 export default class LogSignScreen extends Component {
+	componentDidMount(){
+		BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
+	}
+	componentWillUnmount(){
+		BackHandler.removeEventListener('hardwareBackPress', ()=> {return this.handleBackButton()});
+	}
+	handleBackButton() {
+		  BackHandler.exitApp();
+  }
 	changeZindex = () => {
 		this.signInScreen.changeZindex();
 	};

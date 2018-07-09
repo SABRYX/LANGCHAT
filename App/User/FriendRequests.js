@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, ScrollView, BackHandler, TouchableOpacity } from 'react-native';
-import { Actions } from 'react-native-router-flux';
+import { View, Image, ScrollView, BackHandler, TouchableOpacity,ListView } from 'react-native';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
     Title, Text, Form, Spinner, List, ListItem, Thumbnail, Badge
@@ -12,15 +11,15 @@ import storage from '../services/storage'
 import api from '../services/api';
 import { NavigationActions } from 'react-navigation' ;
 import { globals } from "../services/globals";
-import UserChat from "./UserChat";
 
 export default class FriendRequest extends Component {
     accessToken;
 
     constructor(props) {
         super(props);
+        this.ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         this.state = {
-            screen: 3,
+            screen:2,
             dataLoaded: "Loading",
             friends: [],
             currentFriend: null,
@@ -28,21 +27,10 @@ export default class FriendRequest extends Component {
         }
     }
 
-    componentDidMount() {
+    componentWillMount() {
+        console.log("FREIEND REQUEST")
         BackHandler.addEventListener('hardwareBackPress', () => {
-            if (this.state.screen == 1) {
-            this.props.navigation.dispatch(NavigationActions.reset(
-              {
-                 index: 0,
-                 actions: [
-                   NavigationActions.navigate({ routeName: 'MainAppScreen'})
-                 ]
-               }))
-                return true;
-            }
-            else {this.setState({ screen: 1 });this.props.navigation.goBack();}
-
-            return true;
+            this.props.navigation.goBack()
         });
 
         storage.getItem(storage.keys.accessToken).then((result) => {
@@ -56,31 +44,17 @@ export default class FriendRequest extends Component {
             })
         })
     }
-
-    removeRequestFromUI(requestNumber) {
-        var index = requestNumber;
-        console.log(index)
-        console.log(this.state.friends)
-        // var anotherNum = this.state.friends.indexOf(this.state.friends.data.requestNumber)
-
-        // console.log(anotherNum)
-        // this.state.friends.splice(index,1);
-        // delete this.state.friends[index]
-        // // console.log(requestNumber);
-        // this.setState({ friends: this.state.friends })
-
-
+    componentDidMount(){
+        console.log("DONE request")
     }
 
     reject_friend_request(to) {
-        console.log(this.accessToken)
         api.reject_friend_request(to, this.accessToken).then((response) => {
             console.log(response)
         });
     }
 
     accept_friend_request(to) {
-        console.log(this.accessToken)
         api.accept_friend_request(to, this.accessToken).then((response) => {
             console.log(response)
         });
@@ -89,19 +63,30 @@ export default class FriendRequest extends Component {
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress');
     }
+    deleteRow(secId, rowId, rowMap,data,type) {
+        if (type=="accept"){
+            this.accept_friend_request(data.from)
+
+        }else if (type=="reject"){
+            this.reject_friend_request(data.from)
+            console.log(data.from)
+
+        }
+        rowMap[`${secId}${rowId}`].props.closeRow();
+        const newData = [...this.state.friends];
+        newData.splice(rowId, 1);
+        this.setState({ friends: newData });
+      }
 
     renderBody() {
         console.log(this.state.dataLoaded)
-        if (this.state.screen == 3) {
             return (
 
                 <Content style={{ width: config.screenWidth }}>
-                    {
+                 {
 
-                        this.state.dataLoaded == "done" ?
-                            <List style={{ marginTop: 5 }} dataArray={this.state.friends.sort((a, b) => {
-                                return new Date(b.last_message_date) - new Date(a.last_message_date);
-                            })}
+                    this.state.dataLoaded == "done" ?
+                        <List style={{ marginTop: 5 }}  dataSource={this.ds.cloneWithRows(this.state.friends)}
                                 renderRow={(friend, s1, index) =>
                                     <ListItem style={{ backgroundColor: 'transparent', marginTop: "2%", flexDirection: "row", flex: 1 }}>
                                         <Left style={{ margin: "0%", flex: 1 }}>
@@ -117,25 +102,22 @@ export default class FriendRequest extends Component {
                                         <Body style={{ marginLeft: "0%", width: 180, flex: 3 }}>
                                             <Text style={{ fontWeight: 'normal', textAlign: "left" }}>{friend.friend.name}</Text>
                                         </Body>
-                                        <Right style={{ flexDirection: "row", flex: 2, justifyContent: "space-between" }}>
-                                            <TouchableOpacity style={{ width: 50, height: 40, margin: "0%", justifyContent: "center" }}
-                                                 onPress={() => { this.accept_friend_request(this.state.friends[index].friend.id);var user =this.state.friends[index].friend.id ;this.removeRequestFromUI(user);console.log(user) }}
-                                            >
-                                                <Icon name='check' type="FontAwesome" style={{ color: "green", alignSelf: "center" }} />
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity style={{ width: 50, height: 40, margin: "0%", justifyContent: "center" }}
-                                                onPress={() => { this.reject_friend_request(this.state.friends[index].friend.to); this.removeRequestFromUI(index); }}
-                                            >
-                                                <Icon name='remove' type="FontAwesome" style={{ color: "red", alignSelf: "center" }} />
-                                            </TouchableOpacity>
-                                        </Right>
                                     </ListItem>
-                                }>
+                                }  renderRightHiddenRow={(data, secId, rowId, rowMap) =>
+                                    <Button full danger onPress={_ => this.deleteRow(secId, rowId, rowMap,data,"reject")}>
+                                      <Icon active name="remove" type="FontAwesome" />
+                                    </Button>}
+                                    renderLeftHiddenRow={(data, secId, rowId, rowMap) =>
+                                        <Button full success onPress={_ => this.deleteRow(secId, rowId, rowMap,data,"accept")}>
+                                          <Icon active name="check" type="FontAwesome" />
+                                        </Button>}
+                                    rightOpenValue={-75}
+                                    leftOpenValue={75}
+                                    >
                             </List>
-                            :
-                            null
-                    }
+                             :
+                             null
+                     }
 
                     {
                         this.state.dataLoaded != "done" ?
@@ -146,15 +128,13 @@ export default class FriendRequest extends Component {
                             :
                             null
                     }
-                </Content>);
-        }
-
-        return null;
+                </Content>)
     }
 
 
 
     render() {
+        const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         return (
             <Container style={{ backgroundColor: 'white', flex: 1 }}>
             <Content style={{ backgroundColor: 'white', flex: 1 }}>
