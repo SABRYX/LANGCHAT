@@ -13,6 +13,7 @@ class Language {
           password: 'Password',
           repeat: 'Repeat Password',
           newPassword:"New Password",
+          PhoneNumber:"Phone Number",
           checkFields: 'Fill in all fields.',
           loginSuccess: 'Login successful.',
           dontRemember: 'Forgot your password?',
