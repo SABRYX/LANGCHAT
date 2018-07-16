@@ -25,6 +25,8 @@ const config = {
         remove_friend:`${API}/friend/remove_friend`,
         get_messages_count:`${API}/friend/get_messages_count`,
         cancel_request:`${API}/room/cancel_request`,
+        go_offline:`${API}/message/go_offline`,
+        go_online:`${API}/message/go_online`,
     }
 }
 

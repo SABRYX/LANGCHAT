@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
 import { View, Image, ListView, BackHandler,AsyncStorage } from 'react-native';
 import {
-    Container, Header, Left, Body, Right, Button, Icon, Content,
-    Title, Text, Spinner, List, ListItem,Badge
+    Container, Left, Body, Right, Button, Icon, Content, 
+    Text, Spinner, List, ListItem,Badge
 } from 'native-base';
 import ImageLoad from 'react-native-image-placeholder';
 import config from "../../src/config/app.js";
-import styles from "../../style/app.js";
 import storage from '../services/storage'
 import api from '../services/api';
 import {globals} from "../services/globals";
-import UserChat from "./UserChat";
-import IconBadge from 'react-native-icon-badge';
 import { NavigationActions } from 'react-navigation' ;
 
 export default class UserFriends extends Component {
@@ -89,34 +86,31 @@ export default class UserFriends extends Component {
         })
 
         console.log(globals.mainSocket)
-        // globals.mainSocket.on('chat_message', (data) => {
-        //     if (this.state.screen == 1) {
-        //         if (data.user_id == globals.user.id) {
-        //             let friends = this.state.friends;
-        //             let _friend = null;
-        //             console.log("hoola")
-        //             friends.forEach((friend, index) => {
-        //                 console.log(friend)
-        //                 if (friend.user.id == data.message.user._id) {
-        //                     friend.last_message = data.message.text
-        //                     friend.last_message_time = data.last_message_time
-        //                     friend.last_message_date = data.last_message_date
-        //                     friend.is_seen = false
-        //                     _friend = friend;
+        globals.mainSocket.on('chat_message', (data) => {
+            console.log("data",data)
+                if (data.user_id == globals.user.id) {
+                    let friends = this.state.friends;
+                    let _friend = null;
+                    friends.forEach((friend, index) => {
+                        console.log(friend)
+                        if (friend.user_id == data.message.user._id) {
+                            friend.last_message = data.message.text
+                            friend.last_message_time = data.last_message_time
+                            friend.last_message_date = data.last_message_date
+                            friend.is_seen = false
+                            _friend = friend;
 
-        //                     friends.splice(index, 1)
-        //                 }
-        //             })
+                            friends.splice(index, 1)
+                        }
+                    })
 
-        //             this.setState({ friends: friends })
-        //             if (_friend != null)
-        //                 friends.push(_friend)
-        //             this.setState({ friends: friends })
-        //         }
-        //     }
-        //     else this.state.userChatRef.updateMessage(data)
-        // })
-        this.wordWrittenGenerator();
+                    this.setState({ friends: friends })
+                    if (_friend != null)
+                        friends.push(_friend)
+                    this.setState({ friends: friends })
+                }
+            else this.state.userChatRef.updateMessage(data)
+        })
     }
 
     wordWrittenGenerator(){
@@ -159,16 +153,16 @@ export default class UserFriends extends Component {
                 <Content style={{ width: config.screenWidth,height:config.screenHeight,flex:1 }}>
                     {
                         this.state.dataLoaded == "done" && this.state.friends != false ? 
-                        <List style={{marginRight:"2%",marginLeft:"2%"}}
+                        <List style={{marginRight:"0%",marginLeft:"0%",marginBottom:"5%"}}
                             dataSource={this.ds.cloneWithRows(this.state.friends)}
                             renderRow={(friend, s1, index) =>
                                     <ListItem
                                         onPress={async () =>{await this.setState({ screen: 1, currentFriend: friend,last_message:friend.last_message });this.goToChat()}}
-                                        style={{ backgroundColor: friend.is_seen ? 'transparent' : 'transparent' }}>
+                                        style={{ backgroundColor: friend.is_seen ? 'transparent' : '#eaf2ff' }}>
                                                 <Left style={{ margin: "0%", flex: 1 }}>
                                                     {/* <Thumbnail source={{uri: friend.avatar}} /> */}
                                                     <ImageLoad
-                                                        style={{ width: 50, height: 50 }}
+                                                        style={{ width: 50, height: 50,marginLeft:"5%" }}
                                                         loadingStyle={{ width: 50, height: 50 }}
                                                         placeholderStyle={{ width: 50, height: 50, resizeMode: Image.resizeMode.stretch, borderRadius: 50 }}
                                                         borderRadius={50}
@@ -182,10 +176,10 @@ export default class UserFriends extends Component {
                                                 </Left>
                                                 <Body style={{ marginLeft: "0%", width: 180, flex: 3 }}>
                                                     <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }}>{friend.name}</Text>
-                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note> {this.state.messageWritten} </Text>
+                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.email.substring(0, 30) + (friend.email.length > 30 ? '...' : '')}</Text> 
                                                 </Body>
                                                 <Right style={{ flexDirection: "row", flex: 2, justifyContent: "space-between" }}>
-                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message_time}</Text>
+                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.email}</Text>
                                                 </Right>
                                             </ListItem>
                                         }
@@ -216,14 +210,11 @@ export default class UserFriends extends Component {
         return null;
     }
     goToChat(){
-        
         this.props.navigation.navigate("UserChat",{friend_id: this.state.currentFriend.id, friend_name: this.state.currentFriend.name,title: this.state.currentFriend.name})
-        console.log(this.state)
     }
 
     backToChat=()=>{
          this.getMessagesMain();
-         console.log("here is backtochat")
     }
     badgeGenerator(){
         if(this.state.BadgeCount>0){

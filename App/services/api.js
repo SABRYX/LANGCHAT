@@ -97,6 +97,12 @@ const api =  {
     cancel_request: async (accessToken) => {
         return await apiFetch(config.urls.cancel_request, methods.post, null, accessToken);
     },
+    go_offline:async (accessToken) => {
+        return await apiFetch(config.urls.go_offline, methods.post,null, accessToken);
+    },
+    go_online:async (accessToken) => {
+        return await apiFetch(config.urls.go_online, methods.post,null, accessToken);
+    },
 }
 
 module.exports = api;

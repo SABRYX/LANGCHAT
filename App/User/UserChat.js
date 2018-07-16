@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { View, Image, ScrollView, TouchableOpacity,BackHandler,KeyboardAvoidingView,AsyncStorage } from 'react-native';
-import {
-    Container, Header, Left, Body, Right, Button, Icon, Content,
-    Title, Text, Form, Spinner, List, ListItem, Thumbnail
-} from 'native-base';
-import config from "../../src/config/app.js";
-import styles from "../../style/app.js";
+import { TouchableOpacity,BackHandler } from 'react-native';
+import { Container, Icon } from 'native-base';
 import storage from '../services/storage'
 import api from '../services/api';
-import { GiftedChat, Send } from 'react-native-gifted-chat'
+import { GiftedChat } from 'react-native-gifted-chat'
 import { globals } from "../services/globals";
 const socketIOClient = require('socket.io-client');
 let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });

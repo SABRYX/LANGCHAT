@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { TouchableHighlight, View, Image,BackHandler,TouchableOpacity,AsyncStorage,Platform } from 'react-native';
+import { TouchableHighlight, Image,BackHandler,TouchableOpacity,AsyncStorage,Platform,AppState,DeviceEventEmitter } from 'react-native';
 import { Button, Text, Icon, Spinner,Fab, Container } from 'native-base';
 import Thumbnails from "../../src/components/Thumbnails.js";
 import FullScreenVideo from "../../src/components/FullScreenVideo.js";
 import styles from "../../style/app.js";
-import storage from '../services/storage'
+import storage from '../services/storage';
+import { View } from 'react-native-animatable';
 import webRTCServices from '../../src/lib/services.js';
 import api from '../services/api';
 import GestureRecognizer  from 'react-native-swipe-gestures'; 
@@ -13,6 +14,7 @@ const socketIOClient = require('socket.io-client');
 let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });
 var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
 const logo = require("../../image/logo.png");
+import * as Animatable from 'react-native-animatable';
 const SELF_STREAM_ID = "self_stream_id";
 
 
@@ -38,7 +40,7 @@ export default class MainAppScreen extends Component {
 			socketId:null,
 			friendId:null,
 			friendRequstedFromId:null,
-			BadgeCount:0,
+			BadgeCount:5,
 			fabActive:false,
 			speaker:false,
 			mic:false,
@@ -50,6 +52,12 @@ export default class MainAppScreen extends Component {
 	async componentWillMount() {
 		this.getLocalStream();
 		this.retrieveData();
+		storage.getItem(storage.keys.accessToken).then((result) => {
+			api.go_online(result).then((response)=>{console.log(response)})
+			// api.get_friend_requests_count(result).then((response)=>{console.log(response)
+			// this.setState({BadgeCount:response})})
+           
+		})
 	}
 	
 	retrieveData = async () => {
@@ -84,6 +92,11 @@ export default class MainAppScreen extends Component {
 
 	componentDidMount(){
 		BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
+		DeviceEventEmitter.addListener(
+			'ON_HOME_BUTTON_PRESSED',
+			() => {
+			  console.log('You tapped the home button!')
+		   })
 		socket.on('custom_message', (data) => {
 			if (data.type == 'exitCall'){
 					if (globals.user.id===data.your_id){
@@ -98,9 +111,50 @@ export default class MainAppScreen extends Component {
 				 this.acceptedFriendRequest();
 			 }
 		});
+		///////////////  EVENT LISTENER FOR APP STATE ///////////////////////
+		AppState.addEventListener('change', state => {
+			if (state === 'active') {
+				storage.getItem(storage.keys.accessToken).then((result) => {
+					api.go_online(result).then((response)=>{console.log(response)})
+				})
+			  
+			} else if (state === 'background') {
+				if(this.state.joinState === "joined"){
+					storage.getItem(storage.keys.accessToken).then((result) => {
+						api.cancel_request(result).then((response)=>{console.log(response)})
+						this.exitCall(result,this.state.friendId,this.state.socketId);
+						console.log(this.state.friendId,this.state.socketId)
+						api.go_offline(result).then((response)=>{console.log(response)})
+					})
+					
+				  }
+				  else if (this.state.joinState === "joining" ){
+					storage.getItem(storage.keys.accessToken).then((result) => {
+						api.cancel_request(result).then((response)=>{console.log(response)})
+						api.go_offline(result).then((response)=>console.log(response))
+					})
+					this.setState({
+						joinState:"ready",
+						alreadyFriends:null,
+						friendRequest:null,
+						friendRequested:null,
+						socketId:null,
+						friendId:null,
+						friendRequstedFromId:null,})
+				  }else if (this.state.joinState == "ready"){
+					storage.getItem(storage.keys.accessToken).then((result) => {
+						api.go_offline(result).then((response)=>{console.log(response)})
+					})
+				  }
+			} else if (state === 'inactive') {
+				console.log(this.state.joinState)
+			}
+		  });
 	}
 
+
 	async componentWillUnmount() {
+		AppState.removeEventListener('change');
 		if (this.state.joinState === "joined" || this.state.joinState === "joining" ){
 			const value = await AsyncStorage.getItem('accessToken');
 			api.cancel_request(value).then((response)=>{console.log(response)})
@@ -129,7 +183,7 @@ export default class MainAppScreen extends Component {
 			BackHandler.exitApp();
 		  }
 		  
-    }
+	}
 
 	getLocalStream = () => {
 		webRTCServices.getLocalStream(true, (stream) => {
@@ -158,12 +212,7 @@ export default class MainAppScreen extends Component {
 			this.setState({gestureNotification:true})
 		}
 	  }
-	  getMessagesCount(){
-		  api.get_messages_count(this.state.accessToken).then((response)=>{
-			  this.setState({BadgeCount:response})
-		  }
-		  )
-	  }
+	 
 
 	  badgeGenerator(){
         if(this.state.BadgeCount>0){
@@ -175,7 +224,11 @@ export default class MainAppScreen extends Component {
     render() {
 		
 	  let activeStreamResult = this.state.streams.filter(stream => stream.id == this.state.activeStreamId);
-	  
+	  let animationType;
+  
+	  if (this.state.BadgeCount>0) {
+		animationType = 'swing';
+	  } 
       return (
 		<GestureRecognizer
 		onSwipeDown={(state) => this.onSwipeDown(state)}
@@ -202,23 +255,27 @@ export default class MainAppScreen extends Component {
 				}
 				{
 				this.state.joinState=="ready" ?
-				<Fab
-					active={this.state.fabActive}
-					direction="up"
-					containerStyle={{zIndex:2 }}
-					style={{ backgroundColor: 'deepskyblue' }}
-					position="bottomLeft"
-					onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
-				
-					<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 35}} />
-						<Button style={{ backgroundColor: 'purple' }} onPress={() => this.props.navigation.navigate("UserSettings")}>
-							<Icon style={{color: 'white', fontSize: 30}} name="account-settings-variant"  type="MaterialCommunityIcons"/>
-						</Button>
-						<Button style={{ backgroundColor: 'indigo' }} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
-							<Icon style={{color: 'white', fontSize: 30}} name="chat"  type="Entypo"/>
-						</Button>
+					<Fab
+						active={this.state.fabActive}
+						direction="up"
+						containerStyle={{zIndex:2,height:"30%" }}
+						style={{ backgroundColor: 'deepskyblue' }}
+						position="bottomLeft"
+						onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
 
-				</Fab>
+						<Animatable.View animation={"flash"} iterationCount="infinite" duration={4000} style={{zIndex:2}}>
+							<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 40}} />
+						</Animatable.View>
+							<Button style={{ backgroundColor: 'purple' }} onPress={() => this.props.navigation.navigate("UserSettings")}>
+								<Icon style={{color: 'white', fontSize: 30}} name="account-settings-variant"  type="MaterialCommunityIcons"/>
+							</Button>
+							<Button style={{ backgroundColor: 'indigo' }} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
+							<Animatable.View animation={"flash"} iterationCount="infinite" duration={4000} style={{zIndex:2}}>
+								<Icon style={{color: 'white', fontSize: 30}} name="chat"  type="Entypo"/>
+							</Animatable.View>
+							</Button>
+					</Fab>
+
 				:null		
 			}
 
@@ -414,8 +471,12 @@ export default class MainAppScreen extends Component {
 	}
 
 	exitCall(accessToken,friend_id,socketId) {
+		if (socketId==null){
+			this.handleJoinClick()
+		}
 		webRTCServices.exitCallFromOtherUser(accessToken,friend_id);
 		webRTCServices.exitCall(socketId);
+
 		this.setState({
 			joinState: "ready",
 			alreadyFriends:null,
