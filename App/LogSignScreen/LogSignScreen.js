@@ -70,17 +70,17 @@ export default class LogSignScreen extends Component {
 				/>
 				<View
 					style={{
-						backgroundColor: appMainColor, width, height: GLOBAL.bodyHeight, alignItems: 'center', justifyContent: 'center',
+						backgroundColor: "white", width, height: GLOBAL.bodyHeight, alignItems: 'center', justifyContent: 'center',
 					}}
 				>
 					<Animatable.View
 						animation="fadeIn"
 						delay={1900}
 						duration={1000}
-						style={{ position: 'absolute' }}
+						style={{ position: 'absolute',backgroundColor:"white" }}
 					>
 						<LinearGradient
-							colors={[gradient1, gradient2, appMainColor]}
+							colors={["white", "white", "white"]}
 							style={{ width, height: GLOBAL.bodyHeight }}
 						/>
 					</Animatable.View>

@@ -13,7 +13,7 @@ class LogSignScreenStyles {
       GLOBAL.inputTextStyle = {
         autoCorrect: false,
         maxLength: 100,
-        selectionColor: mainThemeColor,
+        selectionColor: "grey",
         placeholderTextColor: placeHolderColor,
         style: {
           paddingBottom: height / 400,
@@ -21,7 +21,7 @@ class LogSignScreenStyles {
           fontSize: GLOBAL.totalSize(2.34),
           height: height / 13,
           paddingLeft: width / 40,
-          color: mainThemeColor,
+          color: "inputTextStylegrey",
         },
       };
 
@@ -60,7 +60,7 @@ class LogSignScreenStyles {
           flexDirection: 'row',
         },
         text: {
-          fontSize: GLOBAL.totalSize(2.24), fontWeight: '500', color: mainThemeColor,
+          fontSize: GLOBAL.totalSize(2.24), fontWeight: '500', color:"grey",
         },
       });
 
@@ -96,14 +96,14 @@ class LogSignScreenStyles {
           flex: 1,
         },
         clickText: {
-          textAlign: 'center', color: mainReverseThemeColor, fontSize: GLOBAL.totalSize(2.21), fontWeight: '500',
+          textAlign: 'center', color: "black", fontSize: GLOBAL.totalSize(2.21), fontWeight: '500',
         },
       });
 
       GLOBAL.keyboardAvoidView = {
         style: { flex: 1 },
         resetScrollToCoords: { x: 0, y: 0 },
-        contentContainerStyle: { backgroundColor: appMainColor },
+        contentContainerStyle: { backgroundColor: "whitez" },
         extraHeight: height / 10,
         keyboardOpeningTime: 0,
         enableOnAndroid: true,
@@ -118,7 +118,7 @@ class LogSignScreenStyles {
           marginRight: width / 40, alignSelf: 'center',
         },
         remember: {
-          color: `${mainThemeColor}DC`, fontSize: GLOBAL.totalSize(2.2), backgroundColor: 'transparent',
+          color: "#D3D3D3", fontSize: GLOBAL.totalSize(2.2), backgroundColor: 'transparent',
         },
       });
     }

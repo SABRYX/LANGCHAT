@@ -7,7 +7,7 @@ import UserFriends from './User/UserFriends';
 import UserChat from './User/UserChat';
 import FriendRequest from "./User/FriendRequests";
 import SignInScreen from "./LogSignScreen/SignInScreen/SignInScreen"
-import containerOfTabs from "./User/containerOfTabs"
+
 
 const App = StackNavigator({
     Moderator: { screen: Moderator,navigationOptions: { header: null }},
@@ -22,7 +22,7 @@ const App = StackNavigator({
         FriendRequest: { screen: FriendRequest }
    },
    {
-    tabBarOptions: {style:{marginTop:"0%",backgroundColor:"deepskyblue"},
+    tabBarOptions: {style:{marginTop:"0%",backgroundColor:"#8ee2ff"},
     },
     initialRouteName: 'UserFriends',
     swipeEnabled:false,
@@ -34,7 +34,7 @@ const App = StackNavigator({
 {
   headerMode: 'screen',
   navigationOptions: {
-    headerStyle: { backgroundColor: 'deepskyblue',marginTop:"4%",
+    headerStyle: { backgroundColor: '#8ee2ff',marginTop:"4%",
     shadowColor : '#5bc4ff',
     shadowOpacity: 0,
     shadowOffset: {

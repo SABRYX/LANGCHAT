@@ -76,20 +76,20 @@ const api =  {
     get_all_requests: async (accessToken) => {
         return await apiFetch(config.urls.get_all_requests, methods.get, null, accessToken);
     },
-    accept_friend_request: async (to, accessToken) => {
-        return await apiFetch(config.urls.accept_friend_request, methods.post, JSON.stringify({ friend_id: to }), accessToken);
+    accept_friend_request: async (sender_id, accessToken) => {
+        return await apiFetch(config.urls.accept_friend_request, methods.post, JSON.stringify({ sender_id: sender_id }), accessToken);
     },
-    reject_friend_request: async (to, accessToken) => {
-        return await apiFetch(config.urls.reject_friend_request, methods.post, JSON.stringify({ friend_id: to }), accessToken);
+    reject_friend_request: async (sender_id, accessToken) => {
+        return await apiFetch(config.urls.reject_friend_request, methods.post, JSON.stringify({ sender_id: sender_id }), accessToken);
     },
-    add_friend: async (to, accessToken) => {
-        return await apiFetch(config.urls.add_friend, methods.post,JSON.stringify({ to: to }), accessToken);
+    add_friend: async (recipient_id, accessToken) => {
+        return await apiFetch(config.urls.add_friend, methods.post,JSON.stringify({ recipient_id: recipient_id }), accessToken);
     },
     get_friend_requests_count: async (accessToken) => {
         return await apiFetch(config.urls.get_friend_requests_count, methods.get, null, accessToken);
     },
-    remove_friend: async (to, accessToken) => {
-        return await apiFetch(config.urls.remove_friend, methods.post,JSON.stringify({ friend_id: to }), accessToken);
+    remove_friend: async (friend_id, accessToken) => {
+        return await apiFetch(config.urls.remove_friend, methods.post,JSON.stringify({ friend_id: friend_id }), accessToken);
     },
     get_messages_count: async (accessToken) => {
         return await apiFetch(config.urls.get_messages_count, methods.get, null, accessToken);

@@ -100,9 +100,9 @@ export default class RegisterButton extends Component {
       animationType = null;
     }
 
-    let indicator = (<Text uppercase={false} style={{ color: registerColor, fontWeight: '500', fontSize: GLOBAL.totalSize(2.22) }}>{language.create}</Text>);
+    let indicator = (<Text uppercase={false} style={{ color: "grey", fontWeight: '500', fontSize: GLOBAL.totalSize(2.22) }}>{language.create}</Text>);
     if (this.state.isRegistering) {
-      indicator = (<Spinner color={registerColor} size="large" />);
+      indicator = (<Spinner color={"#8ee2ff"} size="large" />);
     }
 
     return (
@@ -113,7 +113,7 @@ export default class RegisterButton extends Component {
           activeOpacity={0.5}
           onPress={this.registerUser}
           style={{
-            borderColor: registerColor, alignSelf: 'center', justifyContent: 'center', width: (width * 13) / 20, height: height / 14,
+            borderColor: "#E0E0E0", alignSelf: 'center', justifyContent: 'center', width: (width * 13) / 20, height: height / 14,
           }}
         >
           {indicator}

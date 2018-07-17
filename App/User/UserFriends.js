@@ -26,12 +26,15 @@ export default class UserFriends extends Component {
             last_message:null,
             messageWritten:null,
             BadgeCount:1,
+            user_id:null
         }
     }
     
   async  componentWillMount(){
         const value = await AsyncStorage.getItem('accessToken');
         const accessTokennn = await AsyncStorage.getItem('accessToken');
+        const user_id = await AsyncStorage.getItem('user_id');
+        this.setState({user_id:user_id})
         api.check_token(value,accessTokennn).then((response) => {
             console.log("response",response)
             if (response.message == "Unauthenticated.") {
@@ -46,7 +49,6 @@ export default class UserFriends extends Component {
             }else{
                 this.getMessagesMain();
                 this.getFriendRequestCount();
-                console.log(this.props.navigation.state)
                
             }
         })
@@ -75,8 +77,10 @@ export default class UserFriends extends Component {
             if (this.state.friends = []){
 
             api.get_all_friends(result).then((response) => {
+                console.log(response,"friendz")
                 response.data.forEach(element => {
-                   this.state.friends.push(element.friend)
+                    console.log(element,"element")
+                   this.state.friends.push(element)
                 });
 
                 console.log(this.state.friends,"{{}}}")
@@ -85,7 +89,6 @@ export default class UserFriends extends Component {
         }
         })
 
-        console.log(globals.mainSocket)
         globals.mainSocket.on('chat_message', (data) => {
             console.log("data",data)
                 if (data.user_id == globals.user.id) {
@@ -111,6 +114,14 @@ export default class UserFriends extends Component {
                 }
             else this.state.userChatRef.updateMessage(data)
         })
+        globals.mainSocket.on("custom_message",(data)=>{
+            if (data.your_id==this.state.user_id){
+                this.getMessagesMain()
+            }
+            if(data.user_id=this.state.user_id){
+                this.getMessagesMain()
+            }
+        })
     }
 
     wordWrittenGenerator(){
@@ -135,15 +146,14 @@ export default class UserFriends extends Component {
     deleteRow(secId, rowId, rowMap,data) {
         storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
-            console.log(accessToken)
-            console.log(data.id)
-            api.remove_friend(data.id,accessToken).then((response)=>{
+            api.remove_friend(data.friend.id,accessToken).then((response)=>{
                 console.log(response)})
         })
         rowMap[`${secId}${rowId}`].props.closeRow();
         const newData = [...this.state.friends];
         newData.splice(rowId, 1);
         this.setState({ friends: newData });
+        setTimeout(()=>{globals.mainSocket.emit("custom_message",{type: 'CheckMessages', data: { your_id:data.friend.id}})},2000)
       }
 
     renderBody() {
@@ -152,13 +162,13 @@ export default class UserFriends extends Component {
                 
                 <Content style={{ width: config.screenWidth,height:config.screenHeight,flex:1 }}>
                     {
-                        this.state.dataLoaded == "done" && this.state.friends != false ? 
+                        this.state.dataLoaded == "done" && this.state.friends.length>0 ? 
                         <List style={{marginRight:"0%",marginLeft:"0%",marginBottom:"5%"}}
                             dataSource={this.ds.cloneWithRows(this.state.friends)}
                             renderRow={(friend, s1, index) =>
                                     <ListItem
-                                        onPress={async () =>{await this.setState({ screen: 1, currentFriend: friend,last_message:friend.last_message });this.goToChat()}}
-                                        style={{ backgroundColor: friend.is_seen ? 'transparent' : '#eaf2ff' }}>
+                                        onPress={async () =>{await this.setState({ screen: 1, currentFriend: friend.friend,last_message:friend.last_message });this.goToChat()}}
+                                        style={{ backgroundColor: friend.friend.is_seen ? 'transparent' : '#eaf2ff' }}>
                                                 <Left style={{ margin: "0%", flex: 1 }}>
                                                     {/* <Thumbnail source={{uri: friend.avatar}} /> */}
                                                     <ImageLoad
@@ -166,33 +176,32 @@ export default class UserFriends extends Component {
                                                         loadingStyle={{ width: 50, height: 50 }}
                                                         placeholderStyle={{ width: 50, height: 50, resizeMode: Image.resizeMode.stretch, borderRadius: 50 }}
                                                         borderRadius={50}
-                                                        source={{ uri: friend.avatar }}
+                                                        source={{ uri: friend.friend.avatar }}
                                                         placeholderSource={	require('../../assets/default_avatar.png') } />
                                                     {
-                                                        friend.is_online ? (
+                                                        friend.friend.is_online ? (
                                                         <Icon name='ios-radio-button-on' style={{color:'green', position: 'absolute', bottom: 0, right: -8}} />
                                                         ) : (<Icon name='ios-radio-button-on' style={{color:'grey', position: 'absolute', bottom: 0, right: -8}} />)
                                                     }
                                                 </Left>
                                                 <Body style={{ marginLeft: "0%", width: 180, flex: 3 }}>
-                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }}>{friend.name}</Text>
-                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.email.substring(0, 30) + (friend.email.length > 30 ? '...' : '')}</Text> 
+                                                    <Text style={{ fontWeight: friend.friend.is_seen ? 'normal' : 'bold' }}>{friend.friend.name}</Text>
+                                                    <Text style={{ fontWeight: friend.friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message==null?"start conversation":friend.last_message.substring(0, 30) + (friend.last_message.length > 30 ? '...' : '')}</Text> 
                                                 </Body>
                                                 <Right style={{ flexDirection: "row", flex: 2, justifyContent: "space-between" }}>
-                                                    <Text style={{ fontWeight: friend.is_seen ? 'normal' : 'bold' }} note>{friend.email}</Text>
+                                                    <Text style={{ fontWeight: friend.friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message_time}</Text>
                                                 </Right>
                                             </ListItem>
                                         }
                                         renderRightHiddenRow={(data, secId, rowId, rowMap) =>
-                                            <Button full danger onPress={_ =>{ this.deleteRow(secId, rowId, rowMap,data);console.log(data)}}>
+                                            <Button full danger onPress={_ =>{ this.deleteRow(secId, rowId, rowMap,data);console.log(data.friend.id)}}>
                                               <Icon active name="trash" />
                                             </Button>}
                                         rightOpenValue={-75}
                                         disableLeftSwipe={false}
                                         >
                                 </List>
-                        :
-                      null
+                        :this.checkAgain()
                     }
 
                     {
@@ -221,6 +230,17 @@ export default class UserFriends extends Component {
         return(<Badge style={{scaleX: 0.7, scaleY: 0.7,position:"absolute",}}>
             <Text>{this.state.BadgeCount}</Text>
         </Badge>)}else{return null}
+    }
+    checkAgain(){
+        if(this.state.dataLoaded=="done"){
+        return(
+            <View style={{alignContent:"center",alignItems:"center",marginTop:"45%",marginLeft:"20%",marginRight:"20%",alignSelf:"center"}}>
+                <Icon name="emoticon" type="MaterialCommunityIcons"  style={{color:"grey",fontSize:80}}/>
+                <Text style={{color:"grey",textAlign:"center"}}>
+                    You Dont Have Any Friends At The Moment !
+                </Text>
+            </View>
+        )}
     }
 
 

@@ -119,7 +119,7 @@ class MultiSelect extends Component {
 						style={[styles.indicator,{opacity: this.checkIfSelected(obj.id)}]}
 					/>
 					<View style={styles.rowContent}>
-						<Text style={{paddingLeft: 20, fontSize: 16, color: '#888'}}>
+						<Text style={{paddingLeft: 20, fontSize: 16, color: '#D3D3D3'}}>
 							{obj.name}
 						</Text>
 					</View>
@@ -144,11 +144,11 @@ class MultiSelect extends Component {
 				<View style={styles.modalView}>
 					{/* HEADER SECTION */}
 					<View style={styles.modalHeader}>
-						<Text style={{color:"white",marginRight:"20%"}}>Languages</Text>
+						<Text style={{color:"#D3D3D3",marginRight:"20%"}}>Languages</Text>
 						<TouchableOpacity onPress={() => this.setModalVisible(false)}>
 							<Icon
 								name="md-close"
-								style={{padding: 15, color: '#fff'}}
+								style={{padding: 15, color: '#D3D3D3'}}
 							/>
 						</TouchableOpacity>
 						
@@ -168,7 +168,7 @@ class MultiSelect extends Component {
 							<TouchableOpacity
 								onPress={() => this.setModalVisible(false)}
 								style={[styles.actionButton,styles.primary]}>
-								<Text style={[styles.centerText, {color: '#fff'}]}>Submit</Text>
+								<Text style={[styles.centerText, {color: '#D3D3D3'}]}>Submit</Text>
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -181,13 +181,13 @@ class MultiSelect extends Component {
 				<Item  
 					style={{
 						width: this.props.full ? width - 30 : (width * 7) / 10, 
-						borderBottomColor: mainThemeColor 
+						borderBottomColor: "#D3D3D3" 
 					}}
 					onPress={() => this.setModalVisible(true)}>
 					<Icon
 					name="md-globe"
 					style={{
-						color: this.props.full ? "#333" : mainThemeColor, fontSize: GLOBAL.totalSize(2.61), marginLeft: width / 200,
+						color: this.props.full ? "#D3D3D3" : "#D3D3D3", fontSize: GLOBAL.totalSize(2.61), marginLeft: width / 200,
 					}}
 					/>
 					<Input

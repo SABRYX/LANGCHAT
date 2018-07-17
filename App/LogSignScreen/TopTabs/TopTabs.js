@@ -14,12 +14,12 @@ export default class TopTabs extends Component {
 
   render() {
     return (
-      <View animation="fadeInLeft" delay={750} duration={700} style={[GLOBAL.topTabsStyle.view, {paddingHorizontal: 16}]}>
+      <View animation="fadeInLeft" delay={750} duration={700} style={[GLOBAL.topTabsStyle.view, {paddingHorizontal: 0}]}>
         <Button
           rounded 
           full
           activeOpacity={1}
-          style={[this.state.tabsStyles[0], {borderTopLeftRadius: 6}]}
+          style={this.state.tabsStyles[0]}
           onPress={this.props.switch(0)}
         >
           <Text style={GLOBAL.topTabsStyle.text} uppercase={false}>{language.loginTab}</Text>
@@ -28,7 +28,7 @@ export default class TopTabs extends Component {
           rounded 
           full
           activeOpacity={1}
-          style={[this.state.tabsStyles[1], {borderTopRightRadius: 6}]}
+          style={this.state.tabsStyles[1]}
           onPress={this.props.switch(1)}
         >
           <Text style={GLOBAL.topTabsStyle.text} uppercase={false}>{language.newAccount}</Text>

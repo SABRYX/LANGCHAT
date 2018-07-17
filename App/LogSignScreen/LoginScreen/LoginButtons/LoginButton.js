@@ -81,15 +81,15 @@ export default class LoginButton extends Component {
 
 		if (this.state.canLogin) {
 			animationType = 'pulse';
-			loginColor = mainThemeColor;
+			loginColor = "grey";
 		} else {
-			loginColor = mainThemeColor;
+			loginColor = "grey";
 			animationType = null;
 		}
 
-		let indicator = (<Text uppercase={false} style={{ color: loginColor, fontWeight: '500', fontSize: GLOBAL.totalSize(2.22) }}>{language.login}</Text>);
+		let indicator = (<Text uppercase={false} style={{ color: "grey", fontWeight: '500', fontSize: GLOBAL.totalSize(2.22) }}>{language.login}</Text>);
 		if (this.state.isLogin) {
-			indicator = (<Spinner color={loginColor} size="large" />);
+			indicator = (<Spinner color="#8ee2ff" size="large" />);
 		}
 
 		return (
@@ -100,7 +100,7 @@ export default class LoginButton extends Component {
 					activeOpacity={0.5}
 					onPress={this.loginUser}
 					style={{
-						borderColor: loginColor, alignSelf: 'center', justifyContent: 'center', width: (width * 13) / 20, height: height / 14,
+						borderColor: "#E0E0E0", alignSelf: 'center', justifyContent: 'center', width: (width * 13) / 20, height: height / 14,
 					}}
 				>
 					{indicator}

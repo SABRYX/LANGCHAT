@@ -61,7 +61,7 @@ export default class LoginScreen extends Component {
         delay={1200}
         duration={700}
         ref={(ref) => { this.animationView = ref; }}
-        style={GLOBAL.loginScreenStyle.mainView}
+        style={{backgroundColor:"white"}}
       >
         <Form style={GLOBAL.loginScreenStyle.form}>
           <Email

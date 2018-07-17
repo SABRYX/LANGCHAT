@@ -66,7 +66,7 @@ export default class Password extends Component {
         ref={(ref) => { this.state.iconRef = ref; }}
         name='md-eye-off'
         style={{
-          color: this.props.full ? "#333" : mainThemeColor, fontSize: GLOBAL.totalSize(4), marginRight: width / 200,
+          color: this.props.full ? "#D3D3D3" : "#D3D3D3", fontSize: GLOBAL.totalSize(4), marginRight: width / 200,
         }}
       />
       )
@@ -84,13 +84,13 @@ export default class Password extends Component {
       }}>
       <Item style={{
         width: this.props.full ? width - 30 : (width * 7) / 10,
-        borderBottomColor: mainThemeColor,
+        borderBottomColor: "#D3D3D3",
       }}
       >
         <Icon
           name="md-lock"
           style={{
-            color: this.props.full ? "#333" : mainThemeColor, fontSize: GLOBAL.totalSize(2.61), marginLeft: width / 200,
+            color: this.props.full ? "#D3D3D3" : "#D3D3D3", fontSize: GLOBAL.totalSize(2.61), marginLeft: width / 200,
           }}
         />
         <Input

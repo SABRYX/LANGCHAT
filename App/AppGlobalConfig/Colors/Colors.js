@@ -2,15 +2,15 @@ import tinycolor from 'tinycolor2';
 
 
 mainThemeColors = [
-  ['#F5F5F5', '#606060', '#E0E0E0', '#F5F5F5BC'], // white theme
-  ['#505050', '#EEEEEE', '#E0E0E0', '#686868BC'], // black theme
+  ['#F5F5F5', '#D3D3D3', '#D3D3D3', '#D3D3D3'], // white theme
+  ['#505050', '#D3D3D3', '#D3D3D3', '#D3D3D3'], // black theme
 ];
 
 class Colors {
     defineAppColors = (color) => {
       const baseLight = tinycolor('#ffffff');
-      topTabColorOff = tinycolor.mix(baseLight, color, 90).toHexString();
-      topTabColorOn = tinycolor.mix(baseLight, color, 80).toHexString();
+      topTabColorOff = "white";
+      topTabColorOn = "#8ee2ff";
       gradient1 = tinycolor.mix(baseLight, color, 80).toHexString();
       gradient2 = tinycolor.mix(baseLight, color, 95).toHexString();
     };

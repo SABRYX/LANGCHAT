@@ -88,7 +88,7 @@ export default class Moderator extends Component {
                         backgroundColor:'white'
                         }}>
 						<View style={{height:"50%",width:"80%",alignItems: 'center',}}>
-						 	<Image source={require("../assets/langchat_logo1.png")} style={{height:"58%",width:"68%",borderRadius:100,marginTop:"20%"}}/>
+						 	<Image source={require("../assets/splash_icon.png")} style={{height:"58%",width:"68%",borderRadius:100,marginTop:"20%"}}/>
 						</View>
 					</View>
 			);

@@ -143,7 +143,7 @@ export default class SignInScreen extends Component {
             {this.state.registrationErrorMessage}
           </Text>
         </View>
-        <View style={{ marginTop: height / 50}}>
+        <View style={{ marginTop: height / 60}}>
           <RegisterButton
             navigation={this.props.navigation}
             switch={this.props.switch}

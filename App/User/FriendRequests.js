@@ -23,11 +23,13 @@ export default class FriendRequest extends Component {
             dataLoaded: "Loading",
             friends: [],
             currentFriend: null,
-            userChatRef: null
+            userChatRef: null,
+            user_id:null
         }
     }
 
-    componentWillMount() {
+   async componentWillMount() {
+        const user_id = await AsyncStorage.getItem('user_id');
         console.log("FREIEND REQUEST")
         BackHandler.addEventListener('hardwareBackPress', () => {
             this.props.navigation.goBack()
@@ -40,7 +42,7 @@ export default class FriendRequest extends Component {
                     this.state.friends.push(element)
                     console.log(element)
                 });
-                this.setState({ screen: 3, dataLoaded: "done" })
+                this.setState({ screen: 3, dataLoaded: "done",user_id:user_id })
             })
         })
     }
@@ -55,8 +57,10 @@ export default class FriendRequest extends Component {
     }
 
     accept_friend_request(to) {
+        console.log(to)
+        console.log(this.accessToken)
         api.accept_friend_request(to, this.accessToken).then((response) => {
-            console.log(response)
+            setTimeout(()=>{globals.mainSocket.emit("custom_message",{type: 'CheckMessages', data: { your_id:to,my_Id:this.state.user_id}})},2000)
         });
     }
 
@@ -65,11 +69,10 @@ export default class FriendRequest extends Component {
     }
     deleteRow(secId, rowId, rowMap,data,type) {
         if (type=="accept"){
-            this.accept_friend_request(data.from)
+            this.accept_friend_request(data.friend.id)
 
         }else if (type=="reject"){
-            this.reject_friend_request(data.from)
-            console.log(data.from)
+            this.reject_friend_request(data.friend.id)
 
         }
         rowMap[`${secId}${rowId}`].props.closeRow();
@@ -85,7 +88,7 @@ export default class FriendRequest extends Component {
                 <Content style={{ width: config.screenWidth }}>
                  {
 
-                    this.state.dataLoaded == "done" ?
+                    this.state.dataLoaded == "done"&&this.state.friends.length>0 ?
                         <List style={{ marginTop: 5 }}  dataSource={this.ds.cloneWithRows(this.state.friends)}
                                 renderRow={(friend, s1, index) =>
                                     <ListItem style={{ backgroundColor: 'transparent', marginTop: "2%", flexDirection: "row", flex: 1 }}>
@@ -116,7 +119,7 @@ export default class FriendRequest extends Component {
                                     >
                             </List>
                              :
-                             null
+                             this.checkAgain()
                      }
 
                     {
@@ -131,7 +134,16 @@ export default class FriendRequest extends Component {
                 </Content>)
     }
 
-
+    checkAgain(){
+        return(
+            <View style={{alignContent:"center",alignItems:"center",marginTop:"45%",marginLeft:"20%",marginRight:"20%",alignSelf:"center"}}>
+                <Icon name="emoticon-cool" type="MaterialCommunityIcons"  style={{color:"grey",fontSize:80}}/>
+                <Text style={{color:"grey",textAlign:"center"}}>
+                    You Dont Have Any Friend Requests At The Moment !
+                </Text>
+            </View>
+        )
+    }
 
     render() {
         const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });

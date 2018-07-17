@@ -121,7 +121,7 @@ export default class UserSettings extends Component {
     render() {
         return (
             <Container style={{ backgroundColor: 'white' }}>
-                <Header style={{marginTop: "6%",backgroundColor:"deepskyblue"}} noShadow>
+                <Header style={{marginTop: "6%",backgroundColor:"#8ee2ff"}} noShadow>
                     <Left>
                         <Button transparent onPress={() =>this.props.navigation.goBack(null)}>
                             <Icon name='arrow-back' />
@@ -136,7 +136,7 @@ export default class UserSettings extends Component {
                         {
                             this.state.dataLoaded == "done" ?
                                 <View>
-                                    <View style={{ backgroundColor: "deepskyblue", height: 160, width: config.screenWidth, marginTop: -15, marginBottom: 10 }}>
+                                    <View style={{ backgroundColor: "#8ee2ff", height: 160, width: config.screenWidth, marginTop: -15, marginBottom: 10 }}>
                                         <PhotoUpload
                                             onPhotoSelect={
                                                 avatar => {
@@ -192,7 +192,7 @@ export default class UserSettings extends Component {
                                     </View>
 
                                     <View style={{padding: 10}}>
-                                        <Button iconLeft block onPress={this.updateProfile.bind(this)} style={{marginBottom: 10,backgroundColor:"deepskyblue"}}>
+                                        <Button iconLeft block onPress={this.updateProfile.bind(this)} style={{marginBottom: 10,backgroundColor:"#8ee2ff"}}>
                                             <Icon name='md-checkmark' />
                                             <Text>Update profile</Text>
                                         </Button>

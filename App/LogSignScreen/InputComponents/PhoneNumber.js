@@ -54,7 +54,7 @@ export default class PhoneNumber extends Component {
           }}>
         <Item
           style={{
-            borderBottomColor: mainThemeColor,
+            borderBottomColor: "#D3D3D3",
             width: this.props.full ? width - 30 : (width * 7) / 10,
             height: height / 13,
           }}>
@@ -62,7 +62,7 @@ export default class PhoneNumber extends Component {
             name="mobile"
             type="Entypo"
             style={{
-              color: this.props.full ? "#333" : mainThemeColor, fontSize: GLOBAL.totalSize(2.61), marginLeft: width / 200,
+              color: this.props.full ? "#D3D3D3" : "#D3D3D3", fontSize: GLOBAL.totalSize(2.61), marginLeft: width / 200,
             }}
           />
           <Input

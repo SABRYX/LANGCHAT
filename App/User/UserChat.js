@@ -5,10 +5,7 @@ import storage from '../services/storage'
 import api from '../services/api';
 import { GiftedChat } from 'react-native-gifted-chat'
 import { globals } from "../services/globals";
-const socketIOClient = require('socket.io-client');
-let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });
-
-var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
+import { NavigationActions } from 'react-navigation' ;
 
 
 
@@ -32,7 +29,7 @@ export default class UserChat extends Component {
         title: `${navigation.state.params.title}`,
          headerTitleStyle : {textAlign: 'center',alignSelf:'center'},
             headerStyle:{
-                backgroundColor:'deepskyblue',
+                backgroundColor:'#8ee2ff',
                 marginTop:"4%",
             },
         });
@@ -55,10 +52,13 @@ export default class UserChat extends Component {
         // }
         this.loadMessages(null)
         BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.goBack()
+            this.props.navigation.dispatch(NavigationActions.back({
+                routeName: 'Home',
+              }))
+                  return true;
         })
         
-        socket.on('chat_message',  (data)=> {
+        globals.mainSocket.on('chat_message',  (data)=> {
             console.log(data)
             console.log("userChat")
             console.log(globals.user.id)
@@ -101,7 +101,6 @@ export default class UserChat extends Component {
 
     onSend(messages = []) {
         api.send_message(this.state.friend_id, messages[0].text, accessToken).then((response) => {
-            console.log(globals.mainSocket)
             globals.mainSocket.emit('chat_message', {
                 user_id: this.state.friend_id,
                 last_message_time: response.message.last_message_time,
@@ -130,7 +129,7 @@ export default class UserChat extends Component {
                     if (props.text.trim().length > 0)
                         this.state.chatRef.onSend({ text: props.text.trim() }, true)
             }} style={{ position: 'absolute', top: 6, right: 5,bottom:1,alignContent:"center",alignItems:"center"}}>
-                <Icon name="send" style={{ color: "deepskyblue"}} />
+                <Icon name="send" style={{ color: "#8ee2ff"}} />
             </TouchableOpacity>
         );
     }

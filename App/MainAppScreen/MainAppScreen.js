@@ -10,13 +10,9 @@ import webRTCServices from '../../src/lib/services.js';
 import api from '../services/api';
 import GestureRecognizer  from 'react-native-swipe-gestures'; 
 import { globals } from "../services/globals";
-const socketIOClient = require('socket.io-client');
-let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });
-var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
-const logo = require("../../image/logo.png");
 import * as Animatable from 'react-native-animatable';
 const SELF_STREAM_ID = "self_stream_id";
-
+var timer;
 
 
 
@@ -44,6 +40,7 @@ export default class MainAppScreen extends Component {
 			fabActive:false,
 			speaker:false,
 			mic:false,
+			trying:false
 		}
 	}
 
@@ -54,6 +51,7 @@ export default class MainAppScreen extends Component {
 		this.retrieveData();
 		storage.getItem(storage.keys.accessToken).then((result) => {
 			api.go_online(result).then((response)=>{console.log(response)})
+			this.setState({accessToken:result})
 			// api.get_friend_requests_count(result).then((response)=>{console.log(response)
 			// this.setState({BadgeCount:response})})
            
@@ -66,7 +64,7 @@ export default class MainAppScreen extends Component {
 		  console.log(value)
 		  if (value !== null) {
 			api.me(value).then((response) => {
-				console.log(response)
+				console.log("this is my fucking response",response)
 				this.setState({accessToken:response.token})
 				storage.setItem(storage.keys.accessToken, response.token)
 				this.setState({name: response.name})
@@ -79,6 +77,7 @@ export default class MainAppScreen extends Component {
 					  await AsyncStorage.setItem("accessToken",response.token);
 					  await AsyncStorage.setItem("name", response.name);
 					  await AsyncStorage.setItem("user", response);
+					  await AsyncStorage.setItem("user_id", response.id);
 					} catch (error) {
 					  console.log(error)
 					}
@@ -97,7 +96,7 @@ export default class MainAppScreen extends Component {
 			() => {
 			  console.log('You tapped the home button!')
 		   })
-		socket.on('custom_message', (data) => {
+		   globals.mainSocket.on('custom_message', (data) => {
 			if (data.type == 'exitCall'){
 					if (globals.user.id===data.your_id){
 						this.handleFriendLeft();
@@ -259,7 +258,7 @@ export default class MainAppScreen extends Component {
 						active={this.state.fabActive}
 						direction="up"
 						containerStyle={{zIndex:2,height:"30%" }}
-						style={{ backgroundColor: 'deepskyblue' }}
+						style={{ backgroundColor: '#8ee2ff' }}
 						position="bottomLeft"
 						onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
 
@@ -299,10 +298,6 @@ export default class MainAppScreen extends Component {
 		</GestureRecognizer>
       );
     }
-
-	renderLogo() {
-		return <Image source={logo} style={styles.logo} resizeMode={"contain"} />;
-	}
 	renderGestureNotification() {
 		if (this.state.gestureNotification == false && this.state.hideInfo == true) {
 			return (
@@ -323,7 +318,7 @@ export default class MainAppScreen extends Component {
 			return <View style={[styles.joinContainer]}>
 				{/* <Pulse color='#6ae4e0' numPulses={3} diameter={300} speed={20} duration={2000} /> */}
 				<TouchableHighlight style={styles.joinButton} activeOpacity={0}
-					onPress={this.handleJoinClick.bind(this)}>
+					onPress={()=>{if(this.state.joinState=="ready"){this.setState({trying:true});this.handleJoinClick()}else if(this.state.joinState=="joining"){this.handleJoinClickDismiss()}}}>
 					{
 						this.state.joinState == "ready" ?
 						<Icon style={{color: 'white', fontSize: 50}} name="ios-happy" />
@@ -424,28 +419,41 @@ export default class MainAppScreen extends Component {
 			streams: this.state.streams.filter(stream => stream.id == SELF_STREAM_ID)
 		});
 	}
-
 	async handleJoinClick() {
-		if (this.state.joinState=="ready"){
+		console.log("here here here")
+		if(this.state.joinState=="ready"){	
 			this.setState({
-			joinState: "joining"
-			});
+			joinState: "joining",trying:true
+			});}
 		let callbacks = {
 			joined: this.handleJoined.bind(this),
 			friendConnected: this.handleFriendConnected.bind(this),
 			dataChannelMessage: this.handleDataChannelMessage.bind(this),
 		}
-
 		api.get_room(this.state.accessToken).then((response) => {
-			this.setState({
-				friendId:response.friend_id,
-				alreadyFriends:response.user_is_friend,
-				friendRequest:response.user_is_friend_request,
-				friendRequested:response.user_is_friend_requested,})
-			webRTCServices.join(response.room_token, this.state.name, callbacks);
+			if(response.message!="added to waiting list or already in!"){
+				this.setState({
+					friendId:response.friend_id,
+					alreadyFriends:response.user_is_friend,
+					friendRequest:response.user_is_friend_request,
+					friendRequested:response.user_is_friend_requested,
+					trying:false
+				})
+				clearTimeout(timer)
+				webRTCServices.join(response.room_token, this.state.name, callbacks);
+			}else if(response.message=="added to waiting list or already in!"){
+				if(this.state.trying==true){
+					console.log(this.state.trying)
+					 timer = setTimeout(()=>{this.handleJoinClick()},10000);
+					 console.log(timer)
+				}
+
+			}
 		})
 		
 	}
+
+	async handleJoinClickDismiss(){
 		if (this.state.joinState != 'ready') {
 				this.setState({
 				joinState:"ready",
@@ -454,12 +462,17 @@ export default class MainAppScreen extends Component {
 				friendRequested:null,
 				socketId:null,
 				friendId:null,
-				friendRequstedFromId:null,})
+				friendRequstedFromId:null,
+				trying:false
+			})
 				const value = await AsyncStorage.getItem('accessToken');
 				api.cancel_request(value).then((response)=>{console.log(response)})
+				clearTimeout(timer)
 		}
-		
+
 	}
+
+
 
 	//----------------------------------------------------------------------------
 	//  WebRTC service callbacks
