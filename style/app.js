@@ -50,7 +50,7 @@ export default StyleSheet.create({
   },
 
   joinLabel: {
-    color: "#6ae4e0",
+    color: "deepskyblue",
     fontSize: 12,
     fontWeight: "bold",
     marginTop: 10
@@ -79,7 +79,7 @@ export default StyleSheet.create({
     height: 80,
     marginTop: 10,
     borderRadius: 100,
-    backgroundColor: "#6ae4e0"
+    backgroundColor: "deepskyblue"
   },
   joinButtonText: {
     color: "white",

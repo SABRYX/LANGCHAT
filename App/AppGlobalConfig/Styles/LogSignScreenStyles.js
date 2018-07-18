@@ -21,7 +21,6 @@ class LogSignScreenStyles {
           fontSize: GLOBAL.totalSize(2.34),
           height: height / 13,
           paddingLeft: width / 40,
-          color: "inputTextStylegrey",
         },
       };
 
@@ -103,7 +102,7 @@ class LogSignScreenStyles {
       GLOBAL.keyboardAvoidView = {
         style: { flex: 1 },
         resetScrollToCoords: { x: 0, y: 0 },
-        contentContainerStyle: { backgroundColor: "whitez" },
+        contentContainerStyle: { backgroundColor: "white" },
         extraHeight: height / 10,
         keyboardOpeningTime: 0,
         enableOnAndroid: true,

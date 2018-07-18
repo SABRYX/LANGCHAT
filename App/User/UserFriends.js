@@ -115,12 +115,15 @@ export default class UserFriends extends Component {
             else this.state.userChatRef.updateMessage(data)
         })
         globals.mainSocket.on("custom_message",(data)=>{
+            if(data.type=="CheckMessages"){
             if (data.your_id==this.state.user_id){
+                 this.setState({friends:[]})
                 this.getMessagesMain()
             }
-            if(data.user_id=this.state.user_id){
+            if(data.user_id==this.state.user_id){
+                this.setState({friends:[]})
                 this.getMessagesMain()
-            }
+            }}
         })
     }
 
@@ -159,7 +162,6 @@ export default class UserFriends extends Component {
     renderBody() {
         if (this.state.screen == 1) {
             return(
-                
                 <Content style={{ width: config.screenWidth,height:config.screenHeight,flex:1 }}>
                     {
                         this.state.dataLoaded == "done" && this.state.friends.length>0 ? 
@@ -188,7 +190,7 @@ export default class UserFriends extends Component {
                                                     <Text style={{ fontWeight: friend.friend.is_seen ? 'normal' : 'bold' }}>{friend.friend.name}</Text>
                                                     <Text style={{ fontWeight: friend.friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message==null?"start conversation":friend.last_message.substring(0, 30) + (friend.last_message.length > 30 ? '...' : '')}</Text> 
                                                 </Body>
-                                                <Right style={{ flexDirection: "row", flex: 2, justifyContent: "space-between" }}>
+                                                <Right style={{ flexDirection: "row", flex: 2, justifyContent: "space-between",justifyContent:"flex-end" }}>
                                                     <Text style={{ fontWeight: friend.friend.is_seen ? 'normal' : 'bold' }} note>{friend.last_message_time}</Text>
                                                 </Right>
                                             </ListItem>

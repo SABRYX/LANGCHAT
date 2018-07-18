@@ -29,7 +29,7 @@ export default class UserChat extends Component {
         title: `${navigation.state.params.title}`,
          headerTitleStyle : {textAlign: 'center',alignSelf:'center'},
             headerStyle:{
-                backgroundColor:'#8ee2ff',
+                backgroundColor:'deepskyblue',
                 marginTop:"4%",
             },
         });
@@ -129,7 +129,7 @@ export default class UserChat extends Component {
                     if (props.text.trim().length > 0)
                         this.state.chatRef.onSend({ text: props.text.trim() }, true)
             }} style={{ position: 'absolute', top: 6, right: 5,bottom:1,alignContent:"center",alignItems:"center"}}>
-                <Icon name="send" style={{ color: "#8ee2ff"}} />
+                <Icon name="send" style={{ color: "deepskyblue"}} />
             </TouchableOpacity>
         );
     }

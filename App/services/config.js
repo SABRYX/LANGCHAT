@@ -23,7 +23,7 @@ const config = {
         add_friend:`${API}/friend/add_friend`,
         get_friend_requests_count:`${API}/friend/get_friend_requests_count`,
         remove_friend:`${API}/friend/remove_friend`,
-        get_messages_count:`${API}/friend/get_messages_count`,
+        get_messages_count:`${API}/message/get_messages_count`,
         cancel_request:`${API}/room/cancel_request`,
         go_offline:`${API}/message/go_offline`,
         go_online:`${API}/message/go_online`,

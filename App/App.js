@@ -18,13 +18,12 @@ const App = StackNavigator({
     UserChat:{screen:UserChat},
     Home:{
     screen: TabNavigator({
-        UserFriends: { screen: UserFriends },
-        FriendRequest: { screen: FriendRequest }
+        "Friends": { screen: UserFriends },
+        "Friend Requests": { screen: FriendRequest }
    },
    {
-    tabBarOptions: {style:{marginTop:"0%",backgroundColor:"#8ee2ff"},
-    },
-    initialRouteName: 'UserFriends',
+    tabBarOptions: {style:{marginTop:"0%",backgroundColor:"deepskyblue"},activeTintColor:"white",inactiveTintColor:"#e8e8e8"},
+    initialRouteName: 'Friends',
     swipeEnabled:false,
     animationEnabled: true,       // add this to fix
     lazy: false,     
@@ -34,7 +33,7 @@ const App = StackNavigator({
 {
   headerMode: 'screen',
   navigationOptions: {
-    headerStyle: { backgroundColor: '#8ee2ff',marginTop:"4%",
+    headerStyle: { backgroundColor: 'deepskyblue',marginTop:"4%",
     shadowColor : '#5bc4ff',
     shadowOpacity: 0,
     shadowOffset: {

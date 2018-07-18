@@ -61,13 +61,10 @@ export default class RegisterButton extends Component {
             this.storeData(result)
             this.moveToMainAppScreen();  
             this.props.clear();}
-          }else if(result.type == 'error'){
-            var error = this.errorParser(result.message);
+          }else if(result.message == 'The given data was invalid.'){
+            var error = this.errorParser(result.errors);
             this.props.postErrorMessage(error);
-          }else{
-            alert("you can't register ya sara 5alas")
           }
-          
           this.setState({ isRegistering: false, canRegister: false });
         }).catch(error => {
           console.log(error);
@@ -102,7 +99,7 @@ export default class RegisterButton extends Component {
 
     let indicator = (<Text uppercase={false} style={{ color: "grey", fontWeight: '500', fontSize: GLOBAL.totalSize(2.22) }}>{language.create}</Text>);
     if (this.state.isRegistering) {
-      indicator = (<Spinner color={"#8ee2ff"} size="large" />);
+      indicator = (<Spinner color={"deepskyblue"} size="large" />);
     }
 
     return (

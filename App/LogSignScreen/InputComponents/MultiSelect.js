@@ -193,7 +193,6 @@ class MultiSelect extends Component {
 					<Input
 						{...(this.props.full ? GLOBAL.inputTextStyleBlack : GLOBAL.inputTextStyle)}
 						blurOnSubmit={false}
-						returnKeyType="next"
 						ref={(ref) => { this.state.inputRef = ref; }}
 						editable={false}
 						autoCapitalize="sentences"

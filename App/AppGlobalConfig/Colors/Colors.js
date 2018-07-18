@@ -10,7 +10,7 @@ class Colors {
     defineAppColors = (color) => {
       const baseLight = tinycolor('#ffffff');
       topTabColorOff = "white";
-      topTabColorOn = "#8ee2ff";
+      topTabColorOn = "deepskyblue";
       gradient1 = tinycolor.mix(baseLight, color, 80).toHexString();
       gradient2 = tinycolor.mix(baseLight, color, 95).toHexString();
     };

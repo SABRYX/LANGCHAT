@@ -89,7 +89,7 @@ export default class LoginButton extends Component {
 
 		let indicator = (<Text uppercase={false} style={{ color: "grey", fontWeight: '500', fontSize: GLOBAL.totalSize(2.22) }}>{language.login}</Text>);
 		if (this.state.isLogin) {
-			indicator = (<Spinner color="#8ee2ff" size="large" />);
+			indicator = (<Spinner color="deepskyblue" size="large" />);
 		}
 
 		return (

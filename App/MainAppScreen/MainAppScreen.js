@@ -12,6 +12,7 @@ import GestureRecognizer  from 'react-native-swipe-gestures';
 import { globals } from "../services/globals";
 import * as Animatable from 'react-native-animatable';
 const SELF_STREAM_ID = "self_stream_id";
+import SplashScreen from 'react-native-splash-screen';
 var timer;
 
 
@@ -40,7 +41,8 @@ export default class MainAppScreen extends Component {
 			fabActive:false,
 			speaker:false,
 			mic:false,
-			trying:false
+			trying:false,
+			messageCount:0,
 		}
 	}
 
@@ -61,10 +63,8 @@ export default class MainAppScreen extends Component {
 	retrieveData = async () => {
 		try {
 		  const value = await AsyncStorage.getItem('accessToken');
-		  console.log(value)
 		  if (value !== null) {
 			api.me(value).then((response) => {
-				console.log("this is my fucking response",response)
 				this.setState({accessToken:response.token})
 				storage.setItem(storage.keys.accessToken, response.token)
 				this.setState({name: response.name})
@@ -83,6 +83,7 @@ export default class MainAppScreen extends Component {
 					}
 				  }
 			})
+			api.get_messages_count(value).then((response)=>{this.setState({messageCount:response});console.log("response",response);console.log("messageCount",this.state.messageCount)})
 		  }
 		 } catch (error) {
 		   
@@ -149,6 +150,7 @@ export default class MainAppScreen extends Component {
 				console.log(this.state.joinState)
 			}
 		  });
+		  SplashScreen.hide()
 	}
 
 
@@ -253,30 +255,8 @@ export default class MainAppScreen extends Component {
 					: null
 				}
 				{
-				this.state.joinState=="ready" ?
-					<Fab
-						active={this.state.fabActive}
-						direction="up"
-						containerStyle={{zIndex:2,height:"30%" }}
-						style={{ backgroundColor: '#8ee2ff' }}
-						position="bottomLeft"
-						onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
-
-						<Animatable.View animation={"flash"} iterationCount="infinite" duration={4000} style={{zIndex:2}}>
-							<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 40}} />
-						</Animatable.View>
-							<Button style={{ backgroundColor: 'purple' }} onPress={() => this.props.navigation.navigate("UserSettings")}>
-								<Icon style={{color: 'white', fontSize: 30}} name="account-settings-variant"  type="MaterialCommunityIcons"/>
-							</Button>
-							<Button style={{ backgroundColor: 'indigo' }} onPress={() => {this.props.navigation.navigate("UserFriends")}}>
-							<Animatable.View animation={"flash"} iterationCount="infinite" duration={4000} style={{zIndex:2}}>
-								<Icon style={{color: 'white', fontSize: 30}} name="chat"  type="Entypo"/>
-							</Animatable.View>
-							</Button>
-					</Fab>
-
-				:null		
-			}
+					this.fabIcons()
+				}
 
 				{this.renderJoinContainer()}
 				
@@ -413,11 +393,13 @@ export default class MainAppScreen extends Component {
 	}
 
 	handleRejoin() {
-		setTimeout(()=>{this.exitCall(),200}) 
-		this.setState({
+		setTimeout(()=>{this.setState({
 			joinState: "joining",
 			streams: this.state.streams.filter(stream => stream.id == SELF_STREAM_ID)
-		});
+		}),2000}) 
+		
+		this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId)
+
 	}
 	async handleJoinClick() {
 		console.log("here here here")
@@ -569,6 +551,49 @@ export default class MainAppScreen extends Component {
 	acceptedFriendRequest(){
 		this.setState({alreadyFriends:true});
 	}
+	fabIcons(){
+		if(this.state.joinState=="ready"&&this.state.messageCount>0){
+		return(
+					<Fab
+						active={this.state.fabActive}
+						direction="up"
+						containerStyle={{zIndex:2,height:"30%" }}
+						style={{ backgroundColor: 'deepskyblue' }}
+						position="bottomLeft"
+						onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
+						<Animatable.View animation={"flash"} iterationCount="infinite" duration={4000} style={{zIndex:2}}>
+							<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 35}} />
+						</Animatable.View>
+							<Button style={{ backgroundColor: 'purple' }} onPress={() => this.props.navigation.navigate("UserSettings")}>
+								<Icon style={{color: 'white', fontSize: 20}} name="account-settings-variant"  type="MaterialCommunityIcons"/>
+							</Button>
+							<Button style={{ backgroundColor: 'indigo' }} onPress={() => {this.props.navigation.navigate("Friends")}}>
+							<Animatable.View animation={"flash"} iterationCount="infinite" duration={4000} style={{zIndex:2}}>
+								<Icon style={{color: 'white', fontSize: 20}} name="chat"  type="Entypo"/>
+							</Animatable.View>
+							</Button>
+					</Fab>
+						
+		)}
+		else if (this.state.joinState=="ready"&&this.state.messageCount==0){
+			return(
+					<Fab
+						active={this.state.fabActive}
+						direction="up"
+						containerStyle={{zIndex:2,height:"30%" }}
+						style={{ backgroundColor: 'deepskyblue' }}
+						position="bottomLeft"
+						onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
+							<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 35}} />
+							<Button style={{ backgroundColor: 'purple' }} onPress={() => this.props.navigation.navigate("UserSettings")}>
+								<Icon style={{color: 'white', fontSize: 20}} name="account-settings-variant"  type="MaterialCommunityIcons"/>
+							</Button>
+							<Button style={{ backgroundColor: 'indigo' }} onPress={() => {this.props.navigation.navigate("Friends")}}>
+								<Icon style={{color: 'white', fontSize: 20}} name="chat"  type="Entypo"/>
+							</Button>
+					</Fab>)
+		}
+	}
 
 }
 	
@@ -576,3 +601,4 @@ export default class MainAppScreen extends Component {
 
 //// this is exit call function 
 //this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId)
+

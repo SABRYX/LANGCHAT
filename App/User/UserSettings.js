@@ -26,7 +26,9 @@ export default class UserSettings extends Component {
             userAvatar: 'https://thesocietypages.org/socimages/files/2009/05/nopic_192.gif',
             profileAvatar: '',
             dataLoaded: "Loading",
-            oldResponse:null
+            oldResponse:null,
+            email:null,
+            phone:null
         }
     }
     
@@ -39,6 +41,8 @@ export default class UserSettings extends Component {
                 this.setState({oldResponse:response})
                 this.setState({dataLoaded: "done"})
                 this.state.inputs[0].changeText(response.name)
+                this.setState({email:response.email})
+                this.setState({phone:response.phone})
                 this.state.inputs[3].setSelectedItems(response.languages)
                 this.setState({
                     userAvatar: response.avatar
@@ -92,11 +96,14 @@ export default class UserSettings extends Component {
                             if (response.error === "These credentials do not match our records."){
                                 this.returnOldProfile(this.state.oldResponse)
                                 alert("Sorry The Data You Filled In Is Wrong !!")
-                        }else {
+                        }else if(response.type=="success") {
                             this.setState({dataLoaded: 'done'})
                             this.state.inputs[0].changeText(response.data.name)
                             this.state.inputs[3].setSelectedItems(response.data.languages)
                             this.getImage();
+                            }else{
+                                alert("Something Went Wrong !!")
+                                this.returnOldProfile(this.state.oldResponse)
                             }
                           })
                           }
@@ -121,14 +128,14 @@ export default class UserSettings extends Component {
     render() {
         return (
             <Container style={{ backgroundColor: 'white' }}>
-                <Header style={{marginTop: "6%",backgroundColor:"#8ee2ff"}} noShadow>
+                <Header style={{marginTop: "2%",backgroundColor:"deepskyblue"}} noShadow androidStatusBarColor="deepskyblue">
                     <Left>
                         <Button transparent onPress={() =>this.props.navigation.goBack(null)}>
-                            <Icon name='arrow-back' />
+                            <Icon name='arrow-back' style={{color:"white"}}/>
                         </Button>
                     </Left>
                     <Body>
-                        <Title>Profile settings</Title>
+                        <Title style={{color:"white"}}>Profile settings</Title>
                     </Body>
                 </Header>
                 <Body style={{width: config.screenWidth}}>
@@ -136,7 +143,7 @@ export default class UserSettings extends Component {
                         {
                             this.state.dataLoaded == "done" ?
                                 <View>
-                                    <View style={{ backgroundColor: "#8ee2ff", height: 160, width: config.screenWidth, marginTop: -15, marginBottom: 10 }}>
+                                    <View style={{ backgroundColor: "deepskyblue", height: 160, width: config.screenWidth, marginTop: -15, marginBottom: 10 }}>
                                         <PhotoUpload
                                             onPhotoSelect={
                                                 avatar => {
@@ -164,6 +171,30 @@ export default class UserSettings extends Component {
                                             shown={true}
                                             ref={(ref) => { this.state.inputs[0] = ref; }}
                                         />
+                                        <View style={{flexDirection:"row",marginTop:  config.screenHeight  / 40,borderBottomColor:"#D3D3D3",borderBottomWidth:1,width:config.screenWidth-30,marginLeft: config.screenWidth / 25}}>
+                                            <Icon
+                                                type="Zocial"
+                                                name="email"
+                                                style={{
+                                                color: "#D3D3D3" ? "#D3D3D3" : mainThemeColor, fontSize: GLOBAL.totalSize(2.61), marginLeft: config.screenWidth / 200,marginBottom:config.screenWidth / 25
+                                                }}
+                                            />
+                                            <Text style={{marginBottom:config.screenWidth / 25,marginLeft:config.screenWidth / 25}}>
+                                               {this.state.email}
+                                            </Text>
+                                        </View>
+                                        <View style={{flexDirection:"row",marginTop:  config.screenHeight  / 40,borderBottomColor:"#D3D3D3",borderBottomWidth:1, width:config.screenWidth - 30,marginLeft: config.screenWidth / 25}}>
+                                            <Icon
+                                                name="mobile"
+                                                type="Entypo"
+                                                style={{
+                                                color: "#D3D3D3" ? "#D3D3D3" : mainThemeColor, fontSize: GLOBAL.totalSize(2.61), marginLeft: config.screenWidth / 200,marginBottom:config.screenWidth / 25
+                                                }}
+                                            />
+                                            <Text style={{marginBottom:config.screenWidth / 25,marginLeft:config.screenWidth / 25}}>
+                                               {this.state.phone}
+                                            </Text>
+                                        </View>
                                         <Password
                                             full
                                             changeFocus={this.changeInputFocus(1)}
@@ -192,7 +223,7 @@ export default class UserSettings extends Component {
                                     </View>
 
                                     <View style={{padding: 10}}>
-                                        <Button iconLeft block onPress={this.updateProfile.bind(this)} style={{marginBottom: 10,backgroundColor:"#8ee2ff"}}>
+                                        <Button iconLeft block onPress={this.updateProfile.bind(this)} style={{marginBottom: 10,backgroundColor:"deepskyblue"}}>
                                             <Icon name='md-checkmark' />
                                             <Text>Update profile</Text>
                                         </Button>

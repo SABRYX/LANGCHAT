@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, ScrollView, BackHandler, TouchableOpacity,ListView } from 'react-native';
+import { View, Image, BackHandler, AsyncStorage,ListView } from 'react-native';
 import {
     Container, Header, Left, Body, Right, Button, Icon, Content,
     Title, Text, Form, Spinner, List, ListItem, Thumbnail, Badge
@@ -82,12 +82,10 @@ export default class FriendRequest extends Component {
       }
 
     renderBody() {
-        console.log(this.state.dataLoaded)
             return (
 
                 <Content style={{ width: config.screenWidth }}>
                  {
-
                     this.state.dataLoaded == "done"&&this.state.friends.length>0 ?
                         <List style={{ marginTop: 5 }}  dataSource={this.ds.cloneWithRows(this.state.friends)}
                                 renderRow={(friend, s1, index) =>
