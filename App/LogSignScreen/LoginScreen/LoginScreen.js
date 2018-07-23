@@ -51,7 +51,7 @@ export default class LoginScreen extends Component {
   };
 
   forgotPassword = () => {
-    console.warn('Forgot password clicked'); // eslint-disable-line
+    this.props.navigation.navigate("ForgetPassword")
   };
 
   render() {

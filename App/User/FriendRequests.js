@@ -132,7 +132,7 @@ export default class FriendRequest extends Component {
                 </Content>)
     }
 
-    checkAgain(){
+     checkAgain(){
         return(
             <View style={{alignContent:"center",alignItems:"center",marginTop:"45%",marginLeft:"20%",marginRight:"20%",alignSelf:"center"}}>
                 <Icon name="emoticon-cool" type="MaterialCommunityIcons"  style={{color:"grey",fontSize:80}}/>

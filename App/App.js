@@ -1,5 +1,6 @@
 import { StackNavigator,TabNavigator } from 'react-navigation';
 import Moderator from "./Moderator";
+import ForgetPassword  from "./User/ForgetPassword"
 import LogSignScreen from "./LogSignScreen/LogSignScreen"
 import MainAppScreen from './MainAppScreen/MainAppScreen';
 import UserSettings from './User/UserSettings';
@@ -11,6 +12,7 @@ import SignInScreen from "./LogSignScreen/SignInScreen/SignInScreen"
 
 const App = StackNavigator({
     Moderator: { screen: Moderator,navigationOptions: { header: null }},
+    ForgetPassword:{ screen:ForgetPassword,navigationOptions: { header:null }},
     LogSignScreen:{screen:LogSignScreen,navigationOptions: { header: null }},
     MainAppScreen: {screen: MainAppScreen,navigationOptions: { header: null }},
     UserSettings: {screen: UserSettings,navigationOptions: { header: null }},
@@ -36,13 +38,12 @@ const App = StackNavigator({
     headerStyle: { backgroundColor: 'deepskyblue',marginTop:"4%",
     shadowColor : '#5bc4ff',
     shadowOpacity: 0,
-    shadowOffset: {
-    height: 0
-    },
+    shadowOffset: { height: 0 },
     shadowRadius: 0,
     elevation: 0},
     headerTintColor:"white"
-      }
+      },
+    portraitOnlyMode: true
  });
 
 

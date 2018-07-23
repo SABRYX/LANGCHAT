@@ -50,6 +50,7 @@ export default class MainAppScreen extends Component {
 
 	async componentWillMount() {
 		this.getLocalStream();
+		console.log(this.state.streamURLs,this.state.activeStreamId)
 		this.retrieveData();
 		storage.getItem(storage.keys.accessToken).then((result) => {
 			api.go_online(result).then((response)=>{console.log(response)})
@@ -225,6 +226,7 @@ export default class MainAppScreen extends Component {
     render() {
 		
 	  let activeStreamResult = this.state.streams.filter(stream => stream.id == this.state.activeStreamId);
+	  console.log(activeStreamResult)
 	  let animationType;
   
 	  if (this.state.BadgeCount>0) {
@@ -413,6 +415,7 @@ export default class MainAppScreen extends Component {
 			dataChannelMessage: this.handleDataChannelMessage.bind(this),
 		}
 		api.get_room(this.state.accessToken).then((response) => {
+			console.log("get room",response)
 			if(response.message!="added to waiting list or already in!"){
 				this.setState({
 					friendId:response.friend_id,
@@ -422,11 +425,11 @@ export default class MainAppScreen extends Component {
 					trying:false
 				})
 				clearTimeout(timer)
+				console.log(this.state)
 				webRTCServices.join(response.room_token, this.state.name, callbacks);
 			}else if(response.message=="added to waiting list or already in!"){
 				if(this.state.trying==true){
-					console.log(this.state.trying)
-					 timer = setTimeout(()=>{this.handleJoinClick()},10000);
+					 timer = setTimeout(()=>{this.handleJoinClick()},2000);
 					 console.log(timer)
 				}
 

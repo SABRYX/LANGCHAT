@@ -72,7 +72,13 @@ export default class UserSettings extends Component {
     logOut = async () => {
         api.logout(accessToken).then(() => {
             storage.removeItem(storage.keys.accessToken);
-            this.props.navigation.navigate("LogSignScreen")    
+            this.props.navigation.dispatch(NavigationActions.reset(
+                {
+                   index: 0,
+                   actions: [
+                     NavigationActions.navigate({ routeName: 'LogSignScreen'})
+                   ]
+                 }))   
         });
     };
 

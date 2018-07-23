@@ -128,7 +128,7 @@ export default class UserChat extends Component {
             <TouchableOpacity onPress={() => {
                     if (props.text.trim().length > 0)
                         this.state.chatRef.onSend({ text: props.text.trim() }, true)
-            }} style={{ position: 'absolute', top: 6, right: 5,bottom:1,alignContent:"center",alignItems:"center"}}>
+            }} style={{alignContent:"center",alignItems:"center",marginBottom:"3%",marginTop:"1%",marginRight:"2%",marginLeft:"2%"}}>
                 <Icon name="send" style={{ color: "deepskyblue"}} />
             </TouchableOpacity>
         );

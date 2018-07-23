@@ -12,10 +12,12 @@ import SettingsButton from './Settings/SettingsButton';
 import SettingsPanel from './Settings/SettingsPanel';
 import PopupDialogs from './Settings/PopupDialogs/PopupDialogs';
 import Colors from '../AppGlobalConfig/Colors/Colors';
+import SplashScreen from 'react-native-splash-screen';
 
 export default class LogSignScreen extends Component {
 	componentDidMount(){
 		BackHandler.addEventListener('hardwareBackPress',()=> {return this.handleBackButton()});
+		SplashScreen.hide()
 	}
 	componentWillUnmount(){
 		BackHandler.removeEventListener('hardwareBackPress', ()=> {return this.handleBackButton()});

@@ -2,17 +2,14 @@ import WebRTC from 'react-native-webrtc';
 import config from "../config/app.js";
 import {globals} from "../../App/services/globals.js";
 import api from '../../App/services/api';
-import { EventRegister } from 'react-native-event-listeners'
 import InCallManager from 'react-native-incall-manager';
 import {Platform} from "react-native"
+import { DeviceEventEmitter } from 'react-native';
 
 let speaker = false ; 
 let mic = false ; 
-let onFriendLeftCallback = null;
-let onLeave = null;
 let onFriendConnectedCallback = null;
 let onDataChannelMessageCallback = null;
-let onFriendRequsted = null;
 
 const socketIOClient = require('socket.io-client');
 let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });
@@ -29,7 +26,7 @@ function createPeerConnection(friend, isOffer, onDataChannelMessage) {
 	var retVal = new WebRTC.RTCPeerConnection(configuration);
 
 	peerConnections[socketId] = retVal;
-
+	console.log(socketId)
 	retVal.onicecandidate = function (event) {
 		console.log('onicecandidate');
 		if (event.candidate) {
@@ -122,13 +119,13 @@ function exchange(data) {
 	}
 
 	if (data.sdp) {
-		//console.log('exchange sdp', data);
+		console.log('exchange sdp', data);
 		pc.setRemoteDescription(new WebRTC.RTCSessionDescription(data.sdp), function () {
 			if (pc.remoteDescription.type == "offer")
 				pc.createAnswer(function (desc) {
 					//console.log('createAnswer', desc);
 					pc.setLocalDescription(desc, function () {
-						//console.log('setLocalDescription', pc.localDescription);
+						console.log('setLocalDescription', pc.localDescription);
 						socket.emit('exchange', { 'to': fromId, 'sdp': pc.localDescription });
 					}, logError);
 				}, logError);
@@ -147,6 +144,7 @@ socket.on('exchange', function (data) {
 
 socket.on('leave', function (socketId) {
 	console.log("emitted")
+	leave(socketId);
 });
 
 socket.on('connect', function (data) {
@@ -178,7 +176,7 @@ function countFriends(roomId, callback) {
 
 function getLocalStream(isFront, callback) {
 	WebRTC.MediaStreamTrack.getSources(sourceInfos => {
-		console.log(sourceInfos);
+		console.log('sourceInfos',sourceInfos);
 		let videoSourceId;
 		for (const i = 0; i < sourceInfos.length; i++) {
 			const sourceInfo = sourceInfos[i];
@@ -199,7 +197,7 @@ function getLocalStream(isFront, callback) {
 			}
 		}, function (stream) {
 			localStream = stream;
-			console.log("Got Local Stream");
+			console.log("Got Local Stream",localStream);
 			callback(stream);
 		}, (error) => {
 			console.log("Get LocalStream Fail: ", error);
@@ -277,7 +275,9 @@ function exitCallFromOtherUser(accessToken,friend_id,callbacks){
 function leave(socketId) {
 	console.log('leave', socketId);
 	var pc = peerConnections[socketId];
-	pc.close();
+	if(pc){
+		pc.close();
+	}
 	delete peerConnections[socketId];
 }
 

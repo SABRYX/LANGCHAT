@@ -27,7 +27,7 @@ export default class Moderator extends Component {
 			try {
 			  const value = await AsyncStorage.getItem('accessToken');
 			  const accessTokennn = await AsyncStorage.getItem('accessToken');
-			  console.log(accessTokennn)
+			  console.log("this is access",accessTokennn)
 			  if (value !== null) {
 				api.check_token(value,accessTokennn).then((response) => {
 					if (response.message == "Unauthenticated.") {
@@ -56,20 +56,18 @@ export default class Moderator extends Component {
 			StatusBar.setTranslucent(true);
 			StatusBar.setBackgroundColor('deepskyblue');
 		}
+		BackHandler.addEventListener('hardwareBackPress',()=> {return this.onBackPressed()});
 
 	}
 
 
 	onBackPressed = () => {
-		if (this.state.currentScene == "LoginScreen" || this.state.currentScene == "MainAppScreen") {
 			BackHandler.exitApp();
-			return false;
-		}
-		return true;
 	};
 
 	render() {
 		if (this.state.initLoaded) {
+			console.log(this.state.initLoaded)
         }
         return (null);
     }

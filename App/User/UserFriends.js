@@ -162,7 +162,7 @@ export default class UserFriends extends Component {
     renderBody() {
         if (this.state.screen == 1) {
             return(
-                <Content style={{ width: config.screenWidth,height:config.screenHeight,flex:1 }}>
+                <Content style={{ width: config.screenWidth,height:config.screenHeight-150  }}>
                     {
                         this.state.dataLoaded == "done" && this.state.friends.length>0 ? 
                         <List style={{marginRight:"0%",marginLeft:"0%",marginBottom:"5%"}}

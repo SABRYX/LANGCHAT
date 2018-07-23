@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Text, View} from 'react-native';
+import {Text, View,Keyboard} from 'react-native';
 import { Item, Icon, Input } from 'native-base';
 
 
 const emailValidationRegex = `/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/`
 
-export default class Email extends Component {
+export default class ForgetEmail extends Component {
   constructor() {
     super();
     this.state = {
@@ -46,6 +46,7 @@ export default class Email extends Component {
   updateText = (value) => {
     this.setState({value: value});
   };
+  
 
   changeText = (value) => {
     this.setState({value: value});
@@ -73,12 +74,12 @@ export default class Email extends Component {
           <Input
             {...(this.props.full ? GLOBAL.inputTextStyleBlack : GLOBAL.inputTextStyle)}
             blurOnSubmit={false}
-            returnKeyType="next"
+            returnKeyType="done"
             ref={(ref) => { this.state.inputRef = ref; }}
             autoCapitalize="none"
             keyboardType="email-address"
             placeholder={language.email}
-            onSubmitEditing={this.props.changeFocus}
+            onSubmitEditing={Keyboard.dismiss}
             onChangeText={this.updateText}
             onEndEditing={this.checkIfIsCorrect}
           />
@@ -95,14 +96,13 @@ export default class Email extends Component {
   }
 }
 
-Email.propTypes = {
+ForgetEmail.propTypes = {
   update: PropTypes.func.isRequired,
-  changeFocus: PropTypes.func.isRequired,
   special: PropTypes.bool,
   full: PropTypes.bool
 };
 
-Email.defaultProps = {
+ForgetEmail.defaultProps = {
   special: false,
   full: false
 };

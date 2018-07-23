@@ -30,6 +30,7 @@ class Language {
           lan: 'Language',
           language: 'English',
           hello: 'Hello',
+          forget:"Request Password Reset"
         },
         arabic: {
           logOut: 'تسجيل الخروج',
