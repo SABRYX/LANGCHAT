@@ -74,16 +74,18 @@ export default class UserFriends extends Component {
     getMessagesMain(){
         storage.getItem(storage.keys.accessToken).then((result) => {
             accessToken = result
-            if (this.state.friends = []){
-
+            if (this.state.friends === []){
             api.get_all_friends(result).then((response) => {
-                console.log(response,"friendz")
                 response.data.forEach(element => {
-                    console.log(element,"element")
                    this.state.friends.push(element)
                 });
-
-                console.log(this.state.friends,"{{}}}")
+                this.setState({ screen: 1, dataLoaded: "done" })
+            })
+        }else{
+            api.get_all_friends(result).then((response) => {
+                response.data.forEach(element => {
+                   this.state.friends.push(element)
+                });
                 this.setState({ screen: 1, dataLoaded: "done" })
             })
         }
@@ -115,14 +117,15 @@ export default class UserFriends extends Component {
             else this.state.userChatRef.updateMessage(data)
         })
         globals.mainSocket.on("custom_message",(data)=>{
+            console.log(data)
             if(data.type=="CheckMessages"){
             if (data.your_id==this.state.user_id){
-                 this.setState({friends:[]})
-                this.getMessagesMain()
+                this.setState({friends:[],dataLoaded:"loading"})
+                setTimeout(()=>{this.getMessagesMain()},2000)
             }
             if(data.user_id==this.state.user_id){
-                this.setState({friends:[]})
-                this.getMessagesMain()
+                this.setState({friends:[],dataLoaded:"loading"})
+                setTimeout(()=>{this.getMessagesMain()},2000)
             }}
         })
     }
@@ -170,7 +173,7 @@ export default class UserFriends extends Component {
                             renderRow={(friend, s1, index) =>
                                     <ListItem
                                         onPress={async () =>{await this.setState({ screen: 1, currentFriend: friend.friend,last_message:friend.last_message });this.goToChat()}}
-                                        style={{ backgroundColor: friend.friend.is_seen ? 'transparent' : '#eaf2ff' }}>
+                                        style={{ backgroundColor: friend.is_seen==1 ? 'transparent' : '#eaf2ff' }}>
                                                 <Left style={{ margin: "0%", flex: 1 }}>
                                                     {/* <Thumbnail source={{uri: friend.avatar}} /> */}
                                                     <ImageLoad
@@ -222,6 +225,7 @@ export default class UserFriends extends Component {
     }
     goToChat(){
         this.props.navigation.navigate("UserChat",{friend_id: this.state.currentFriend.id, friend_name: this.state.currentFriend.name,title: this.state.currentFriend.name})
+        setTimeout(()=>{this.getMessagesMain(),2000}) 
     }
 
     backToChat=()=>{

@@ -22,6 +22,7 @@ export default class UserChat extends Component {
             chatRef: null,
             page: 1,
             loadEarlier:true,
+            myId:null,
         }
     }
 
@@ -69,6 +70,10 @@ export default class UserChat extends Component {
                     }))
                  }
         });
+        storage.getItem(storage.keys.user_id).then((result) => {
+            user_id = result
+            this.setState({myId:user_id})
+        })
         
     }
     componentWillUnmount() {
@@ -107,6 +112,8 @@ export default class UserChat extends Component {
                 last_message_date: new Date(response.message.last_message_date),
                 message: messages[0]
             })
+
+            globals.mainSocket.emit("custom_message",{type: 'CheckMessages', data: { your_id:this.state.friend_id}})
         })
 
         

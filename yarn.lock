@@ -5255,6 +5255,12 @@ react-native-maps@0.19.0:
   version "0.19.0"
   resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-0.19.0.tgz#ce94fad1cf360e335cb4338a68c95f791e869074"
 
+react-native-modal-overlay@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/react-native-modal-overlay/-/react-native-modal-overlay-1.2.3.tgz#e28ef249544c46e5ab1f292287efe9fca3cee4f1"
+  dependencies:
+    react-native-animatable "^1.2.4"
+
 react-native-multiple-select@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/react-native-multiple-select/-/react-native-multiple-select-0.4.1.tgz#a79ad2a2668df3cb35b8f9ba4cbd04561e1f41ec"

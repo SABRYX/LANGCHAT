@@ -324,7 +324,7 @@ export default class MainAppScreen extends Component {
 				return(
 					<View style={[styles.friendsContainer]}>
 						<TouchableOpacity style={styles.alreadyFriendsButton} activeOpacity={0}
-							onPress={()=>{alert("you are already friends");}}>
+							onPress={()=>{ToastAndroid.show("you are already friends", ToastAndroid.SHORT);}}>
 								<Icon style={{color: 'white', fontSize: 30}} name="check-circle" type="Feather" />
 						</TouchableOpacity>
 					</View>
@@ -335,7 +335,7 @@ export default class MainAppScreen extends Component {
 					return(
 						<View style={[styles.friendsContainer]}>
 							<TouchableOpacity style={styles.waitingFriendButton} activeOpacity={0}
-								onPress={()=>{alert("pending");}}>
+								onPress={()=>{ToastAndroid.show("pending", ToastAndroid.SHORT);}}>
 									<Icon style={{color: 'white', fontSize: 30}} name="send" type="FontAwesome" />
 							</TouchableOpacity>
 						</View>
@@ -344,7 +344,7 @@ export default class MainAppScreen extends Component {
 					return(
 						<View style={[styles.friendsContainer]}>
 							<TouchableOpacity style={styles.addFriendButton} activeOpacity={0}
-								onPress={()=>{alert("added");this.setState({friendRequest:true});this.handleSendFriendRequest(this.state.friendId,globals.user.id)}}>
+								onPress={()=>{ToastAndroid.show("friend request sent", ToastAndroid.SHORT);;this.setState({friendRequest:true});this.handleSendFriendRequest(this.state.friendId,globals.user.id)}}>
 									<Icon style={{color: 'white', fontSize: 30}} name="person-add" type="MaterialIcons" />
 							</TouchableOpacity>
 						</View>
@@ -353,7 +353,7 @@ export default class MainAppScreen extends Component {
 					return(
 						<View style={[styles.friendsContainer]}>
 							<TouchableOpacity style={styles.friendRequstedFromOtherUser} activeOpacity={0}
-								onPress={()=>{alert("you accepted friend Request"); this.handleAcceptFriendRequest(this.state.friendRequstedFromId); console.log(this.state.friendRequstedFromId)}}>
+								onPress={()=>{ToastAndroid.show("accepted friend request", ToastAndroid.SHORT); this.handleAcceptFriendRequest(this.state.friendRequstedFromId); console.log(this.state.friendRequstedFromId)}}>
 									<Icon style={{color: 'white', fontSize: 30}} name="call-received" type="MaterialIcons" />
 							</TouchableOpacity>
 						</View>
@@ -395,10 +395,7 @@ export default class MainAppScreen extends Component {
 	}
 
 	handleRejoin() {
-		setTimeout(()=>{this.setState({
-			joinState: "joining",
-			streams: this.state.streams.filter(stream => stream.id == SELF_STREAM_ID)
-		}),2000}) 
+		setTimeout(()=>{this.handleJoinClick(),2000}) 
 		
 		this.exitCall(this.state.accessToken,this.state.friendId,this.state.socketId)
 

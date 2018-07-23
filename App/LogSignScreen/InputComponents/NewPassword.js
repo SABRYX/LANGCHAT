@@ -31,6 +31,9 @@ export default class NewPassword extends Component {
       else{
         this.state.isCorrect = 1;
         this.state.errorMessage = ''
+        if(this.props.returnValue2){
+          this.props.returnValue2(this.state.value)
+        }
       }
     }
     this.setState(this.state);

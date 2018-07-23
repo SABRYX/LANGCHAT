@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ScrollView,BackHandler,Image} from 'react-native';
+import { View, ScrollView,BackHandler,Image,ToastAndroid} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title, Text, Form, Spinner } from 'native-base';
 import config from "../../src/config/app.js";
 import styles from "../../style/app.js";
@@ -101,14 +101,14 @@ export default class UserSettings extends Component {
                             console.log("response error",response.error)
                             if (response.error === "These credentials do not match our records."){
                                 this.returnOldProfile(this.state.oldResponse)
-                                alert("Sorry The Data You Filled In Is Wrong !!")
+                                ToastAndroid.show("Sorry The Data You Filled In Is Wrong !!", ToastAndroid.SHORT)
                         }else if(response.type=="success") {
                             this.setState({dataLoaded: 'done'})
                             this.state.inputs[0].changeText(response.data.name)
                             this.state.inputs[3].setSelectedItems(response.data.languages)
                             this.getImage();
                             }else{
-                                alert("Something Went Wrong !!")
+                                ToastAndroid.show("Something Went Wrong !!", ToastAndroid.SHORT)
                                 this.returnOldProfile(this.state.oldResponse)
                             }
                           })

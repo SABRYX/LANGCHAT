@@ -1,4 +1,4 @@
-const SERVER = 'http://192.168.1.9:1994/';
+const SERVER = 'https://psycounselor.com:51046';
 const STORAGE = `${SERVER}/storage/`;
 const API = `${SERVER}/api`;
 const config = {
@@ -27,6 +27,9 @@ const config = {
         cancel_request:`${API}/room/cancel_request`,
         go_offline:`${API}/message/go_offline`,
         go_online:`${API}/message/go_online`,
+        forget_password:`${API}/auth/forget_password`,
+        change_password:`${API}/auth/change_password`,
+        check_code:`${API}/auth/check_code`,
     }
 }
 

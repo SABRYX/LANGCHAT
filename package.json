@@ -26,6 +26,7 @@
     "react-native-incall-manager": "^3.0.0",
     "react-native-keyboard-aware-scroll-view": "^0.4.1",
     "react-native-linear-gradient": "^2.3.0",
+    "react-native-modal-overlay": "^1.2.3",
     "react-native-multiple-select": "^0.4.1",
     "react-native-photo-upload": "^1.2.0",
     "react-native-pulse": "^1.0.6",

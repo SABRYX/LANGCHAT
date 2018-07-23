@@ -29,6 +29,9 @@ export default class Password extends Component {
       }else{
         this.state.isCorrect = 1;
         this.state.errorMessage = ''
+        if(this.props.returnValue1){
+          this.props.returnValue1(this.state.value)
+        }
       }
     }
     this.setState(this.state);

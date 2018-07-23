@@ -12,8 +12,11 @@ export default class ForgetButton extends Component {
 
   forgetPassword=()=>{
     this.setState({isRegistering:true})
-    alert(this.props.property)
+    this.props.forgetPassword()
+     setTimeout(()=>{this.getBackFromRegister()},5000)
   }
+
+  getBackFromRegister=()=>{this.setState({isRegistering:false})}
 
   render() {
     const { navigate } = this.props.navigation;

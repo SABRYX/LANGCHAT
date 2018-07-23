@@ -103,6 +103,15 @@ const api =  {
     go_online:async (accessToken) => {
         return await apiFetch(config.urls.go_online, methods.post,null, accessToken);
     },
+    forget_password: async (email) => {
+        return await apiFetch(config.urls.forget_password, methods.post,JSON.stringify({ email: email }));
+    },
+    change_password: async (code,password,password_confirmation) => {
+        return await apiFetch(config.urls.change_password, methods.post,JSON.stringify({ code: code,password:password,password_confirmation }));
+    },
+    check_code: async (code) => {
+        return await apiFetch(config.urls.check_code, methods.post,JSON.stringify({ code: code }));
+    },
 }
 
 module.exports = api;

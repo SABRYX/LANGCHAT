@@ -12,7 +12,7 @@ let onFriendConnectedCallback = null;
 let onDataChannelMessageCallback = null;
 
 const socketIOClient = require('socket.io-client');
-let socket = socketIOClient('http://192.168.1.30:6001/', { transports: ['websocket'], jsonp: false, autoConnect: true });
+let socket = socketIOClient('http://stream.psycounselor.com:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
 
 var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
 var peerConnections = {}; //map of {socketId: socket.io id, RTCPeerConnection}
@@ -193,7 +193,7 @@ function getLocalStream(isFront, callback) {
 					minFrameRate: 30
 				},
 				facingMode: (isFront ? "user" : "environment"),
-				optional: (videoSourceId ? [{ sourceId: videoSourceId }] : [])
+				optional: [{ sourceId: videoSourceId }]
 			}
 		}, function (stream) {
 			localStream = stream;
@@ -277,6 +277,7 @@ function leave(socketId) {
 	var pc = peerConnections[socketId];
 	if(pc){
 		pc.close();
+		InCallManager.stop();
 	}
 	delete peerConnections[socketId];
 }

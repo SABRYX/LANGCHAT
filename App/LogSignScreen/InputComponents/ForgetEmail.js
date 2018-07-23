@@ -29,6 +29,7 @@ export default class ForgetEmail extends Component {
       if(this.validateEmail()){
         this.state.isCorrect = 1;
         this.state.errorMessage = '';
+        this.props.changeText(this.state.value)
       }else{
         this.state.errorMessage = 'Invalid email format!'  
       }
@@ -50,7 +51,8 @@ export default class ForgetEmail extends Component {
 
   changeText = (value) => {
     this.setState({value: value});
-    this.state.inputRef._root.setNativeProps({ text: this.state.value })
+    this.state.inputRef._root.setNativeProps({ text: this.state.value });
+
   };
 
   render() {
@@ -97,7 +99,6 @@ export default class ForgetEmail extends Component {
 }
 
 ForgetEmail.propTypes = {
-  update: PropTypes.func.isRequired,
   special: PropTypes.bool,
   full: PropTypes.bool
 };

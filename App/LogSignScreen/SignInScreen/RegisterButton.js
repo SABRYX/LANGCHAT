@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {AsyncStorage} from "react-native"
+import {AsyncStorage,ToastAndroid} from "react-native"
 import { View } from 'react-native-animatable';
 import { Text, Spinner, Button } from 'native-base';
 import PropTypes from 'prop-types';
@@ -49,7 +49,7 @@ export default class RegisterButton extends Component {
     console.log(name, email,phone, password, repeat, avatar, languages)
     if (!isRegistering) {
       if (!canRegister) {
-        alert("cant register")
+        ToastAndroid.show("can't register", ToastAndroid.SHORT);
       } else {
         this.setState({ isRegistering: true });
 				api.register(name, email, phone, password, languages).then((result) => {
@@ -57,7 +57,7 @@ export default class RegisterButton extends Component {
           console.log(result)
           if(result.message!="The given data was invalid."){
           if(result.type !== 'error'){
-            alert("account Created")
+            ToastAndroid.show("Welcome", ToastAndroid.SHORT);
             this.storeData(result)
             this.moveToMainAppScreen();  
             this.props.clear();}

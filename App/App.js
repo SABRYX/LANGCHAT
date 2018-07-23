@@ -8,17 +8,19 @@ import UserFriends from './User/UserFriends';
 import UserChat from './User/UserChat';
 import FriendRequest from "./User/FriendRequests";
 import SignInScreen from "./LogSignScreen/SignInScreen/SignInScreen"
+import ResetPassword from "./User/ResetPassword"
 
 
 const App = StackNavigator({
-    Moderator: { screen: Moderator,navigationOptions: { header: null }},
-    ForgetPassword:{ screen:ForgetPassword,navigationOptions: { header:null }},
-    LogSignScreen:{screen:LogSignScreen,navigationOptions: { header: null }},
-    MainAppScreen: {screen: MainAppScreen,navigationOptions: { header: null }},
-    UserSettings: {screen: UserSettings,navigationOptions: { header: null }},
-    SignInScreen: {screen: SignInScreen,navigationOptions: { header: null }},
-    UserChat:{screen:UserChat},
-    Home:{
+    Moderator : { screen: Moderator,navigationOptions: { header: null }},
+    ForgetPassword : { screen:ForgetPassword,navigationOptions: { header:null }},
+    ResetPassword : { screen:ResetPassword,navigationOptions : { header:null }},
+    LogSignScreen :{ screen:LogSignScreen,navigationOptions: { header: null }},
+    MainAppScreen : { screen: MainAppScreen,navigationOptions: { header: null }},
+    UserSettings : { screen: UserSettings,navigationOptions: { header: null }},
+    SignInScreen : { screen: SignInScreen,navigationOptions: { header: null }},
+    UserChat : { screen:UserChat },
+    Home : {
     screen: TabNavigator({
         "Friends": { screen: UserFriends },
         "Friend Requests": { screen: FriendRequest }
