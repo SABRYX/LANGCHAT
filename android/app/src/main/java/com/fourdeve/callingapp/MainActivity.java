@@ -1,4 +1,4 @@
-package com.callingapp;
+package com.fourdeve.langchat;
 
 import com.facebook.react.ReactActivity;
 import org.devio.rn.splashscreen.SplashScreen; // import this

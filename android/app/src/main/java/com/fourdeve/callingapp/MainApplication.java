@@ -1,4 +1,4 @@
-package com.callingapp;
+package com.fourdeve.langchat;
 
 import android.app.Application;
 
