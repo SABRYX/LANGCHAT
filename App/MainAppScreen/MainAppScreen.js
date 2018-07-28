@@ -575,6 +575,7 @@ export default class MainAppScreen extends Component {
 					</Fab>
 						
 		)}
+		
 		else if (this.state.joinState=="ready"&&this.state.messageCount==0){
 			return(
 					<Fab
