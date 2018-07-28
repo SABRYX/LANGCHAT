@@ -22,7 +22,7 @@ export default class UserChat extends Component {
             chatRef: null,
             page: 1,
             loadEarlier:true,
-            myId:null,
+            myId:this.props.navigation.state.params.myId,
         }
     }
 
@@ -70,10 +70,6 @@ export default class UserChat extends Component {
                     }))
                  }
         });
-        storage.getItem(storage.keys.user_id).then((result) => {
-            user_id = result
-            this.setState({myId:user_id})
-        })
         
     }
     componentWillUnmount() {

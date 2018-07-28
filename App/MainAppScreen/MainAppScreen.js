@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableHighlight, Image,BackHandler,TouchableOpacity,AsyncStorage,Platform,AppState,DeviceEventEmitter } from 'react-native';
+import { TouchableHighlight, Image,BackHandler,TouchableOpacity,AsyncStorage,Platform,AppState,DeviceEventEmitter,ToastAndroid } from 'react-native';
 import { Button, Text, Icon, Spinner,Fab, Container } from 'native-base';
 import Thumbnails from "../../src/components/Thumbnails.js";
 import FullScreenVideo from "../../src/components/FullScreenVideo.js";

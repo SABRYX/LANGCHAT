@@ -224,7 +224,7 @@ export default class UserFriends extends Component {
         return null;
     }
     goToChat(){
-        this.props.navigation.navigate("UserChat",{friend_id: this.state.currentFriend.id, friend_name: this.state.currentFriend.name,title: this.state.currentFriend.name})
+        this.props.navigation.navigate("UserChat",{friend_id: this.state.currentFriend.id, friend_name: this.state.currentFriend.name,title: this.state.currentFriend.name,myId:this.state.user_id})
         setTimeout(()=>{this.getMessagesMain(),2000}) 
     }
 
