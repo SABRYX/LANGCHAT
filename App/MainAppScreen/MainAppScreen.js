@@ -557,12 +557,12 @@ export default class MainAppScreen extends Component {
 					<Fab
 						active={this.state.fabActive}
 						direction="up"
-						containerStyle={{zIndex:2,height:"30%" }}
+						containerStyle={{zIndex:2,height:"28%" }}
 						style={{ backgroundColor: 'deepskyblue' }}
 						position="bottomLeft"
 						onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
 						<Animatable.View animation={"flash"} iterationCount="infinite" duration={4000} style={{zIndex:2}}>
-							<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 35}} />
+							<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 30}} />
 						</Animatable.View>
 							<Button style={{ backgroundColor: 'purple' }} onPress={() => this.props.navigation.navigate("UserSettings")}>
 								<Icon style={{color: 'white', fontSize: 20}} name="account-settings-variant"  type="MaterialCommunityIcons"/>
@@ -580,11 +580,11 @@ export default class MainAppScreen extends Component {
 					<Fab
 						active={this.state.fabActive}
 						direction="up"
-						containerStyle={{zIndex:2,height:"30%" }}
+						containerStyle={{zIndex:2,height:"28%" }}
 						style={{ backgroundColor: 'deepskyblue' }}
 						position="bottomLeft"
 						onPress={() => this.setState({ fabActive: !this.state.fabActive })}>
-							<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 35}} />
+							<Icon name="message-settings-variant" type="MaterialCommunityIcons" style={{color: 'white', fontSize: 30}} />
 							<Button style={{ backgroundColor: 'purple' }} onPress={() => this.props.navigation.navigate("UserSettings")}>
 								<Icon style={{color: 'white', fontSize: 20}} name="account-settings-variant"  type="MaterialCommunityIcons"/>
 							</Button>

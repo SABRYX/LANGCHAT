@@ -82,6 +82,7 @@ export default class UserFriends extends Component {
                 this.setState({ screen: 1, dataLoaded: "done" })
             })
         }else{
+            this.setState({friends:[]})
             api.get_all_friends(result).then((response) => {
                 response.data.forEach(element => {
                    this.state.friends.push(element)
