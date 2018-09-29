@@ -112,6 +112,9 @@ const api =  {
     check_code: async (code) => {
         return await apiFetch(config.urls.check_code, methods.post,JSON.stringify({ code: code }));
     },
+    get_conversations: async (accessToken) => {
+        return await apiFetch(config.urls.get_conversations, methods.get, null, accessToken);
+    },
 }
 
 module.exports = api;

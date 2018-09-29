@@ -27,11 +27,10 @@ export default class Moderator extends Component {
 			try {
 			  const value = await AsyncStorage.getItem('accessToken');
 			  const accessTokennn = await AsyncStorage.getItem('accessToken');
-			  console.log("this is access",accessTokennn)
 			  if (value !== null) {
 				api.check_token(value,accessTokennn).then((response) => {
 					if (response.message == "Unauthenticated.") {
-							this.props.navigation.navigate("LogSignScreen")
+							this.props.navigation.navigate("Signin")
 					}
 					else {
 						this.setState({accessToken: response.access_token})
@@ -43,7 +42,7 @@ export default class Moderator extends Component {
 					}
 				})
 			  }else{
-				this.props.navigation.navigate("LogSignScreen")
+				this.props.navigation.navigate("Signin")
 			  }
 			 } catch (error) {
 			   console.log("error",error)
@@ -54,7 +53,7 @@ export default class Moderator extends Component {
 	componentDidMount() {
 		if (Platform.OS === 'android') {
 			StatusBar.setTranslucent(true);
-			StatusBar.setBackgroundColor('deepskyblue');
+			StatusBar.setBackgroundColor('transparent');
 		}
 		BackHandler.addEventListener('hardwareBackPress',()=> {return this.onBackPressed()});
 

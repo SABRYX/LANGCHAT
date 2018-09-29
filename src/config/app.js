@@ -1,16 +1,16 @@
 import {Dimensions} from 'react-native';
 
-const window = Dimensions.get('window');
+var {height, width} = Dimensions.get('window');
 
 export default {
-  screenWidth: window.width,
-  screenHeight: window.height,
+  screenWidth: width,
+  screenHeight: height,
   thumbnailHeight: 120,
   thumbnailWidth: 80,
   useRCTView: true, //debug or not?
   video: {
-    minWidth: this.screenWidth,
-    minHeight: this.screenHeight,
+    minWidth: width,
+    minHeight: height,
     minFrameRate: 30
   }
 }

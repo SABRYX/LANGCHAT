@@ -3,11 +3,12 @@ import config from "../src/config/app.js";
 
 export default StyleSheet.create({
   container: {
-    width: config.screenWidth,
-    height: config.screenHeight - (config.thumbnailHeight + 80)
+    flex:1,
+    marginBottom:"10%"
   },
   video: {
-    width: config.screenWidth,
-    height: config.screenHeight
+   flex:1,
+   marginRight:"5%",
+   marginLeft:"5%"
   }
 });

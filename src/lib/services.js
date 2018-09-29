@@ -12,7 +12,7 @@ let onFriendConnectedCallback = null;
 let onDataChannelMessageCallback = null;
 
 const socketIOClient = require('socket.io-client');
-let socket = socketIOClient('http://stream.psycounselor.com:9999/', { transports: ['websocket'], jsonp: false, autoConnect: true });
+let socket = socketIOClient('http://192.168.1.20:6001', { transports: ['websocket'], jsonp: false, autoConnect: true });
 
 var configuration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
 var peerConnections = {}; //map of {socketId: socket.io id, RTCPeerConnection}
@@ -175,6 +175,7 @@ function countFriends(roomId, callback) {
 }
 
 function getLocalStream(isFront, callback) {
+	console.log("hola")
 	WebRTC.MediaStreamTrack.getSources(sourceInfos => {
 		console.log('sourceInfos',sourceInfos);
 		let videoSourceId;
